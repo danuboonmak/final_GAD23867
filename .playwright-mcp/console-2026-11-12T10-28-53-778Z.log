@@ -1,4 +1,0 @@
-[      20ms] [WARNING] [Imagine City] ยังไม่ได้ตั้ง leadEndpoint ใน config.js: ข้อมูลผู้เล่นถูกเก็บในเครื่องเท่านั้น ไม่ถึง SDM @ http://localhost:8765/app.js:486
-[      25ms] [ERROR] Failed to load resource: the server responded with a status of 404 (File not found) @ http://localhost:8765/assets/hero.webp:1
-[   71734ms] [WARNING] [Imagine City] ยังไม่ได้ตั้ง leadEndpoint ใน config.js: ข้อมูลผู้เล่นถูกเก็บในเครื่องเท่านั้น ไม่ถึง SDM @ http://localhost:8765/app.js:486
-[   71738ms] [ERROR] Failed to load resource: the server responded with a status of 404 (File not found) @ http://localhost:8765/assets/hero.webp:1

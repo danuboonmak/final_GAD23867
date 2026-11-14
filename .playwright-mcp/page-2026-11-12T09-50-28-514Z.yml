@@ -1,6 +1,0 @@
-- main [ref=f7e3]:
-  - generic [ref=f7e4]:
-    - heading "คืนสุดท้ายก่อนสีจะหายไป" [active] [level=1] [ref=f7e5]
-    - paragraph [ref=f7e6]: คืนนี้สีสันของ Imagine City กำลังจะหายไปทั้งเมือง และมีเธอเป็นคนเดียวที่ช่วยได้
-    - paragraph [ref=f7e7]: ทุกอย่างซีดเป็นสีเทา เหลือเวลาอีกแค่คืนเดียว ถ้ามีใครขึ้นเวทีในเทศกาล Imagine Design Event แล้วทำให้คนทั้งเมืองกลับมายิ้มได้ สีทั้งหมดก็จะกลับมา
-    - button "ลืมตาตื่น" [ref=f7e9] [cursor=pointer]
