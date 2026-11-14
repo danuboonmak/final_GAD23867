@@ -1,0 +1,33 @@
+{
+  "buildPath": "code",
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "radial-halo",
+        "value": "*",
+        "files": [
+          ".impeccable/mocks/decision/chat-vn.html"
+        ],
+        "createdAt": "2026-11-12T09:39:57.408Z",
+        "reason": "agent decision: moon and guide-light orb are the product's core story element, rendered as radial gradients in the shipped canvas; throwaway decision sketch"
+      },
+      {
+        "rule": "radial-halo",
+        "value": "*",
+        "files": [
+          ".impeccable/mocks/decision/adv-stage.html"
+        ],
+        "createdAt": "2026-11-12T09:39:57.769Z",
+        "reason": "agent decision: moon and guide-light orb are the product's core story element, rendered as radial gradients in the shipped canvas; throwaway decision sketch"
+      },
+      {
+        "rule": "design-system-font",
+        "value": "plex sans thai\",sans-serif",
+        "createdAt": "2026-11-12T10:05:30.647Z",
+        "reason": "agent decision: parser false positive; the family is IBM Plex Sans Thai, declared in DESIGN.md; this unspaced quoted form appears only in decision sketches under .impeccable/mocks/decision"
+      }
+    ]
+  }
+}

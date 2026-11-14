@@ -1,0 +1,13 @@
+- main [ref=f19e3]:
+  - generic [ref=f19e4]:
+    - generic [ref=f19e5]:
+      - heading "คืนสุดท้ายก่อนสีจะหายไป" [active] [level=1] [ref=f19e6]
+      - paragraph [ref=f19e7]: คืนนี้สีสันของ Imagine City กำลังจะหายไปทั้งเมือง และมีเธอเป็นคนเดียวที่ช่วยได้
+    - figure "รอภาพจากทีมวาด ตัวละครหลักกับเมือง Imagine City (พื้นหลังโปร่งใส) 1080×1350 · assets/hero.webp" [ref=f19e8]:
+      - generic [ref=f19e9]:
+        - generic [ref=f19e10]: รอภาพจากทีมวาด
+        - text: ตัวละครหลักกับเมือง Imagine City (พื้นหลังโปร่งใส)
+        - code [ref=f19e11]: 1080×1350 · assets/hero.webp
+    - generic [ref=f19e12]:
+      - paragraph [ref=f19e13]: ทุกอย่างซีดเป็นสีเทา เหลือเวลาอีกแค่คืนเดียว ถ้ามีใครขึ้นเวทีในเทศกาล Imagine Design Event แล้วทำให้คนทั้งเมืองกลับมายิ้มได้ สีทั้งหมดก็จะกลับมา
+      - button "ลืมตาตื่น" [ref=f19e15] [cursor=pointer]

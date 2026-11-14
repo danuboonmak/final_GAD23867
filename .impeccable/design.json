@@ -1,0 +1,745 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-12T10:04:26.811Z",
+  "title": "Design System: Imagine City",
+  "extensions": {
+    "colorMeta": {
+      "glow": {
+        "role": "primary",
+        "displayName": "Lamp Glow",
+        "canonical": "#ffe9a8",
+        "oklch": "oklch(93.7% 0.086 91.6)",
+        "tonalRamp": [
+          "#0d0b05",
+          "#2d2406",
+          "#514000",
+          "#735f1f",
+          "#958142",
+          "#b7a46a",
+          "#d4c9a7",
+          "#f2eee4"
+        ]
+      },
+      "on-glow": {
+        "role": "primary",
+        "displayName": "Ink on Glow",
+        "canonical": "#1a1530",
+        "oklch": "oklch(21.8% 0.052 289.9)",
+        "tonalRamp": [
+          "#0b0b0f",
+          "#252332",
+          "#413e5a",
+          "#605c7d",
+          "#817da0",
+          "#a4a0c2",
+          "#c8c6db",
+          "#eeeef4"
+        ]
+      },
+      "major-dga": {
+        "role": "secondary",
+        "displayName": "DGA Pink",
+        "canonical": "#ff5d8f",
+        "oklch": "oklch(70.3% 0.200 4.8)",
+        "tonalRamp": [
+          "#160509",
+          "#4b001e",
+          "#870035",
+          "#b30052",
+          "#dc3b73",
+          "#ff6a96",
+          "#ffabc0",
+          "#ffe6eb"
+        ]
+      },
+      "major-dgd": {
+        "role": "secondary",
+        "displayName": "DGD Amber",
+        "canonical": "#ffb627",
+        "oklch": "oklch(82.4% 0.163 77.8)",
+        "tonalRamp": [
+          "#110901",
+          "#3c1c00",
+          "#6c3000",
+          "#924f00",
+          "#b77100",
+          "#d89700",
+          "#eac286",
+          "#f9eddb"
+        ]
+      },
+      "major-igd": {
+        "role": "secondary",
+        "displayName": "IGD Mint",
+        "canonical": "#3ddc97",
+        "oklch": "oklch(79.7% 0.164 159.7)",
+        "tonalRamp": [
+          "#020f07",
+          "#003114",
+          "#005822",
+          "#007b3e",
+          "#009e5e",
+          "#2dc183",
+          "#95dcb5",
+          "#e0f4e8"
+        ]
+      },
+      "major-afx": {
+        "role": "secondary",
+        "displayName": "AFX Sky",
+        "canonical": "#4cc9f0",
+        "oklch": "oklch(78.2% 0.121 222.5)",
+        "tonalRamp": [
+          "#030d11",
+          "#002b3c",
+          "#004d6c",
+          "#006e92",
+          "#0091b6",
+          "#42b4d8",
+          "#99d3e9",
+          "#e1f2f8"
+        ]
+      },
+      "major-den": {
+        "role": "secondary",
+        "displayName": "DEN Violet",
+        "canonical": "#9b5de5",
+        "oklch": "oklch(61.1% 0.200 301.8)",
+        "tonalRamp": [
+          "#0e0817",
+          "#301050",
+          "#561191",
+          "#7836bd",
+          "#9a5ce4",
+          "#bb84ff",
+          "#d6b8ff",
+          "#f2eaff"
+        ]
+      },
+      "sky-zenith": {
+        "role": "tertiary",
+        "displayName": "Midnight Zenith",
+        "canonical": "#120a3a",
+        "oklch": "oklch(19.6% 0.087 282.4)",
+        "tonalRamp": [
+          "#0a0a11",
+          "#22223c",
+          "#3c3b6b",
+          "#5a5a91",
+          "#7a7cb5",
+          "#9d9fd7",
+          "#c4c6e8",
+          "#ededf8"
+        ]
+      },
+      "sky-dusk": {
+        "role": "tertiary",
+        "displayName": "Dusk Violet",
+        "canonical": "#3b1d6e",
+        "oklch": "oklch(32.3% 0.132 294.9)",
+        "tonalRamp": [
+          "#0c0913",
+          "#281c44",
+          "#48307b",
+          "#684ea3",
+          "#8970c8",
+          "#ab95e9",
+          "#ccc0f4",
+          "#efecfc"
+        ]
+      },
+      "sky-horizon": {
+        "role": "tertiary",
+        "displayName": "Ember Horizon",
+        "canonical": "#ff7a6b",
+        "oklch": "oklch(73.2% 0.165 28.3)",
+        "tonalRamp": [
+          "#150705",
+          "#480c08",
+          "#800205",
+          "#ab2c24",
+          "#d35246",
+          "#f67b6d",
+          "#ffb3a8",
+          "#ffe8e4"
+        ]
+      },
+      "tower-front": {
+        "role": "tertiary",
+        "displayName": "Tower Front",
+        "canonical": "#2a1f55",
+        "oklch": "oklch(28.6% 0.094 288.4)",
+        "tonalRamp": [
+          "#0b0a11",
+          "#24203c",
+          "#41396d",
+          "#5f5893",
+          "#8079b7",
+          "#a29dd9",
+          "#c7c4e9",
+          "#eeedf9"
+        ]
+      },
+      "tower-mid": {
+        "role": "tertiary",
+        "displayName": "Tower Mid",
+        "canonical": "#1d1640",
+        "oklch": "oklch(23.6% 0.077 286.6)",
+        "tonalRamp": [
+          "#0b0a10",
+          "#232238",
+          "#3f3c66",
+          "#5e5a8b",
+          "#7f7cae",
+          "#a19fd0",
+          "#c6c6e4",
+          "#ededf7"
+        ]
+      },
+      "tower-back": {
+        "role": "tertiary",
+        "displayName": "Tower Back",
+        "canonical": "#120e2a",
+        "oklch": "oklch(18.7% 0.055 286.4)",
+        "tonalRamp": [
+          "#0b0b0f",
+          "#242333",
+          "#403e5c",
+          "#5e5d7f",
+          "#7f7ea2",
+          "#a2a1c4",
+          "#c7c7dc",
+          "#eeeef4"
+        ]
+      },
+      "moon": {
+        "role": "tertiary",
+        "displayName": "Moonlight",
+        "canonical": "#ffe6aa",
+        "oklch": "oklch(93.1% 0.081 88.0)",
+        "tonalRamp": [
+          "#0e0b05",
+          "#2e2408",
+          "#533f03",
+          "#745e24",
+          "#978046",
+          "#b9a36e",
+          "#d5c8a9",
+          "#f2eee5"
+        ]
+      },
+      "orb-core": {
+        "role": "tertiary",
+        "displayName": "Orb Core",
+        "canonical": "#fffae1",
+        "oklch": "oklch(98.2% 0.033 97.7)",
+        "tonalRamp": [
+          "#0c0b09",
+          "#27251b",
+          "#46422f",
+          "#66624c",
+          "#87836c",
+          "#aaa690",
+          "#ccc9bc",
+          "#efeeea"
+        ]
+      },
+      "window-light": {
+        "role": "tertiary",
+        "displayName": "Window Light",
+        "canonical": "#fff6d5",
+        "oklch": "oklch(97.2% 0.044 94.5)",
+        "tonalRamp": [
+          "#0c0b08",
+          "#292518",
+          "#494228",
+          "#696144",
+          "#8b8265",
+          "#ada589",
+          "#cec9b8",
+          "#f0eee9"
+        ]
+      },
+      "night": {
+        "role": "neutral",
+        "displayName": "Night",
+        "canonical": "#0d0b1a",
+        "oklch": "oklch(16.1% 0.031 288.5)",
+        "tonalRamp": [
+          "#0b0b0d",
+          "#24242d",
+          "#414051",
+          "#605f72",
+          "#818094",
+          "#a4a3b7",
+          "#c8c8d4",
+          "#eeeef2"
+        ]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Ink",
+        "canonical": "#f4f1ea",
+        "oklch": "oklch(95.9% 0.010 87.5)",
+        "tonalRamp": [
+          "#0b0b0a",
+          "#262522",
+          "#44423d",
+          "#63615b",
+          "#85827c",
+          "#a7a59f",
+          "#cac9c5",
+          "#efeeed"
+        ]
+      },
+      "ink-dim": {
+        "role": "neutral",
+        "displayName": "Dim Ink",
+        "canonical": "#b9b4c7",
+        "oklch": "oklch(78.0% 0.027 297.8)",
+        "tonalRamp": [
+          "#0b0b0d",
+          "#26242c",
+          "#433f4e",
+          "#635e6f",
+          "#847f91",
+          "#a7a2b3",
+          "#cac7d2",
+          "#efeef1"
+        ]
+      },
+      "danger": {
+        "role": "neutral",
+        "displayName": "Danger Rose",
+        "canonical": "#ffa3b8",
+        "oklch": "oklch(81.3% 0.111 5.0)",
+        "tonalRamp": [
+          "#12080a",
+          "#3d1721",
+          "#6d253b",
+          "#944359",
+          "#b96479",
+          "#dc899c",
+          "#edb9c4",
+          "#faeaed"
+        ]
+      },
+      "panel": {
+        "role": "neutral",
+        "displayName": "Panel",
+        "canonical": "rgba(18, 15, 34, 0.9)",
+        "note": "Translucent by design; ramp steps alpha over the same base, not lightness.",
+        "tonalRamp": [
+          "rgba(18, 15, 34, 0.02)",
+          "rgba(18, 15, 34, 0.05)",
+          "rgba(18, 15, 34, 0.08)",
+          "rgba(18, 15, 34, 0.12)",
+          "rgba(18, 15, 34, 0.2)",
+          "rgba(18, 15, 34, 0.35)",
+          "rgba(18, 15, 34, 0.6)",
+          "rgba(18, 15, 34, 0.9)"
+        ]
+      },
+      "fill": {
+        "role": "neutral",
+        "displayName": "Fill",
+        "canonical": "rgba(255, 255, 255, 0.05)",
+        "note": "Translucent by design; ramp steps alpha over the same base, not lightness.",
+        "tonalRamp": [
+          "rgba(255, 255, 255, 0.02)",
+          "rgba(255, 255, 255, 0.05)",
+          "rgba(255, 255, 255, 0.08)",
+          "rgba(255, 255, 255, 0.12)",
+          "rgba(255, 255, 255, 0.2)",
+          "rgba(255, 255, 255, 0.35)",
+          "rgba(255, 255, 255, 0.6)",
+          "rgba(255, 255, 255, 0.9)"
+        ]
+      },
+      "fill-hover": {
+        "role": "neutral",
+        "displayName": "Fill Hover",
+        "canonical": "rgba(255, 255, 255, 0.1)",
+        "note": "Translucent by design; ramp steps alpha over the same base, not lightness.",
+        "tonalRamp": [
+          "rgba(255, 255, 255, 0.02)",
+          "rgba(255, 255, 255, 0.05)",
+          "rgba(255, 255, 255, 0.08)",
+          "rgba(255, 255, 255, 0.12)",
+          "rgba(255, 255, 255, 0.2)",
+          "rgba(255, 255, 255, 0.35)",
+          "rgba(255, 255, 255, 0.6)",
+          "rgba(255, 255, 255, 0.9)"
+        ]
+      },
+      "fill-input": {
+        "role": "neutral",
+        "displayName": "Fill Input",
+        "canonical": "rgba(255, 255, 255, 0.06)",
+        "note": "Translucent by design; ramp steps alpha over the same base, not lightness.",
+        "tonalRamp": [
+          "rgba(255, 255, 255, 0.02)",
+          "rgba(255, 255, 255, 0.05)",
+          "rgba(255, 255, 255, 0.08)",
+          "rgba(255, 255, 255, 0.12)",
+          "rgba(255, 255, 255, 0.2)",
+          "rgba(255, 255, 255, 0.35)",
+          "rgba(255, 255, 255, 0.6)",
+          "rgba(255, 255, 255, 0.9)"
+        ]
+      },
+      "track": {
+        "role": "neutral",
+        "displayName": "Track",
+        "canonical": "rgba(255, 255, 255, 0.1)",
+        "note": "Translucent by design; ramp steps alpha over the same base, not lightness.",
+        "tonalRamp": [
+          "rgba(255, 255, 255, 0.02)",
+          "rgba(255, 255, 255, 0.05)",
+          "rgba(255, 255, 255, 0.08)",
+          "rgba(255, 255, 255, 0.12)",
+          "rgba(255, 255, 255, 0.2)",
+          "rgba(255, 255, 255, 0.35)",
+          "rgba(255, 255, 255, 0.6)",
+          "rgba(255, 255, 255, 0.9)"
+        ]
+      },
+      "line": {
+        "role": "neutral",
+        "displayName": "Line",
+        "canonical": "rgba(255, 255, 255, 0.14)",
+        "note": "Translucent by design; ramp steps alpha over the same base, not lightness.",
+        "tonalRamp": [
+          "rgba(255, 255, 255, 0.02)",
+          "rgba(255, 255, 255, 0.05)",
+          "rgba(255, 255, 255, 0.08)",
+          "rgba(255, 255, 255, 0.12)",
+          "rgba(255, 255, 255, 0.2)",
+          "rgba(255, 255, 255, 0.35)",
+          "rgba(255, 255, 255, 0.6)",
+          "rgba(255, 255, 255, 0.9)"
+        ]
+      },
+      "line-strong": {
+        "role": "neutral",
+        "displayName": "Line Strong",
+        "canonical": "rgba(255, 255, 255, 0.35)",
+        "note": "Translucent by design; ramp steps alpha over the same base, not lightness.",
+        "tonalRamp": [
+          "rgba(255, 255, 255, 0.02)",
+          "rgba(255, 255, 255, 0.05)",
+          "rgba(255, 255, 255, 0.08)",
+          "rgba(255, 255, 255, 0.12)",
+          "rgba(255, 255, 255, 0.2)",
+          "rgba(255, 255, 255, 0.35)",
+          "rgba(255, 255, 255, 0.6)",
+          "rgba(255, 255, 255, 0.9)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Intro title and result title. Balanced wrapping."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Chapter, scene, district and form screen titles. Balanced wrapping."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Second result title in a mixed result."
+      },
+      "caption": {
+        "displayName": "Caption",
+        "purpose": "Story sticker captions, wrapped by phrase."
+      },
+      "button": {
+        "displayName": "Button",
+        "purpose": "Every button. Mitr 500 is also used at 15px for the speaker name and skip label, and at 14px for major tags."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Card prose; 16px under 480px. Pretty wrapping."
+      },
+      "body-option": {
+        "displayName": "Option",
+        "purpose": "Answer options."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Chips, field hints and errors."
+      },
+      "pick": {
+        "displayName": "Pick",
+        "purpose": "Picked-answer chip in the story player; 1.75 leading for stacked Thai marks."
+      },
+      "tag": {
+        "displayName": "Tag",
+        "purpose": "Career tags, the major pill on the result screen, and the story hint pill. 14px."
+      },
+      "hud": {
+        "displayName": "HUD",
+        "purpose": "Chapter label and counter, tabular numerals; single line only."
+      }
+    },
+    "shadows": [
+      {
+        "name": "lift",
+        "value": "0 8px 20px -8px rgba(0, 0, 0, 0.7)",
+        "purpose": "Hovered buttons (with a 2px rise) and the resting story sticker. Never on cards or panels. CSS var --lift."
+      }
+    ],
+    "canvasLight": [
+      {
+        "name": "orb-glow",
+        "value": "radial gradient rgba(255,250,225,1) to rgba(255,233,168,.85) at 25% to transparent, radius 46px, pulsing by 12%",
+        "purpose": "The guide orb on the effects canvas, with three orbiting motes."
+      },
+      {
+        "name": "moon-halo",
+        "value": "radial gradient rgba(255,230,170,.55) to transparent, radius 90px, around a 26px moonlight disc",
+        "purpose": "Static moon in the baked sky."
+      },
+      {
+        "name": "street-fog",
+        "value": "linear gradient rgba(13,11,26,0) to rgba(13,11,26,.9) over the bottom 25%",
+        "purpose": "Grounds the skyline and darkens the street edge."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease-out",
+        "value": "cubic-bezier(.2, .8, .2, 1)",
+        "purpose": "Standard easing: card rise, story chip-in, meter fill. CSS var --ease-out."
+      },
+      {
+        "name": "ease-expo",
+        "value": "cubic-bezier(.16, 1, .3, 1)",
+        "purpose": "Sticker-in only."
+      },
+      {
+        "name": "card-rise",
+        "value": "0.6s ease-out, from translateY(24px) and opacity 0",
+        "purpose": "Card entrance."
+      },
+      {
+        "name": "card-sink",
+        "value": "0.3s ease, to translateY(-16px) and opacity 0",
+        "purpose": "Card exit."
+      },
+      {
+        "name": "story-fade",
+        "value": "0.25s in, 0.2s out",
+        "purpose": "Story layer enter and leave."
+      },
+      {
+        "name": "chip-in",
+        "value": "0.5s ease-out, from rotate(6deg) translateY(16px) and opacity 0",
+        "purpose": "Picked-answer chip entrance."
+      },
+      {
+        "name": "sticker-in",
+        "value": "0.55s ease-expo, from rotate(-9deg) scale(.86) translateY(14px) and opacity 0",
+        "purpose": "Caption sticker entrance on every frame."
+      },
+      {
+        "name": "meter-fill",
+        "value": "0.8s ease-out (0.2s reduced)",
+        "purpose": "HUD meter width."
+      },
+      {
+        "name": "press",
+        "value": "transform .15s ease, box-shadow .25s ease",
+        "purpose": "Button hover rise and press."
+      },
+      {
+        "name": "city-saturation",
+        "value": "1400ms ease-out cubic (250ms reduced)",
+        "purpose": "City gray-to-color step per answer."
+      },
+      {
+        "name": "tower-paint",
+        "value": "700ms linear ramp (instant when reduced)",
+        "purpose": "Answer color painting a front tower."
+      },
+      {
+        "name": "camera-dolly",
+        "value": "lerp 0.045 per frame; zoom 1.08 + 0.06 per story frame (instant when reduced)",
+        "purpose": "Camera moves toward the painted tower, anchored at the bottom edge."
+      },
+      {
+        "name": "story-frame",
+        "value": "clamp(3200ms, 2600 + 55ms per character, 7000ms); 220ms hold pauses",
+        "purpose": "Story progress bar duration and hold-to-pause threshold."
+      },
+      {
+        "name": "reduced-motion",
+        "value": "fade-in .2s, fade-out .15s; canvas loop stops when idle",
+        "purpose": "Replaces all movement under prefers-reduced-motion."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "compact",
+        "value": "480px",
+        "purpose": "max-width: card padding 22px 18px, body 16px."
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The next action on every card: lamp-glow pill in Mitr.",
+      "html": "<button class=\"ds-btn\">ลืมตาตื่น</button>",
+      "css": ".ds-btn { display: inline-flex; align-items: center; justify-content: center; min-height: 48px; font: 500 17px 'Mitr', sans-serif; padding: 10px 26px; border-radius: 99px; border: 0; cursor: pointer; background: var(--glow, #ffe9a8); color: var(--on-glow, #1a1530); transition: transform .15s ease, box-shadow .25s ease, opacity .2s ease; } .ds-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px -8px rgba(0,0,0,0.7); } .ds-btn:active { transform: translateY(0); } .ds-btn:focus-visible { outline: 3px solid var(--ink, #f4f1ea); outline-offset: 3px; } .ds-btn:disabled { opacity: .55; cursor: default; }"
+    },
+    {
+      "name": "Ghost Button",
+      "kind": "button",
+      "refersTo": "button-ghost",
+      "description": "Secondary choice in a pair: skip the form, play again.",
+      "html": "<button class=\"ds-btn-ghost\">ข้ามไปก่อน</button>",
+      "css": ".ds-btn-ghost { display: inline-flex; align-items: center; justify-content: center; min-height: 48px; font: 500 17px 'Mitr', sans-serif; padding: 10px 26px; border-radius: 99px; cursor: pointer; background: transparent; color: var(--ink, #f4f1ea); border: 1px solid var(--line, rgba(255,255,255,0.14)); transition: transform .15s ease, box-shadow .25s ease; } .ds-btn-ghost:hover { transform: translateY(-2px); box-shadow: 0 8px 20px -8px rgba(0,0,0,0.7); } .ds-btn-ghost:focus-visible { outline: 3px solid var(--ink, #f4f1ea); outline-offset: 3px; }"
+    },
+    {
+      "name": "Card",
+      "kind": "card",
+      "refersTo": "card",
+      "description": "The translucent night panel every question sits on.",
+      "html": "<section class=\"ds-card\"><h2 class=\"ds-card-h\">บทที่ 1 ตื่นขึ้นในเมืองไร้สี</h2><p class=\"ds-card-p\">ทุกอย่างรอบตัวเธอเป็นสีเทา แต่มือของเธอยังขยับได้</p></section>",
+      "css": ".ds-card { max-width: 620px; background: var(--panel, rgba(18,15,34,0.9)); border: 1px solid var(--line, rgba(255,255,255,0.14)); border-radius: 18px; padding: 28px 24px; color: var(--ink, #f4f1ea); font: 400 17px/1.65 'IBM Plex Sans Thai', system-ui, sans-serif; } .ds-card-h { font: 500 clamp(22px, 5vw, 28px)/1.3 'Mitr', sans-serif; margin: 0 0 12px; text-wrap: balance; } .ds-card-p { margin: 0; color: var(--ink-dim, #b9b4c7); text-wrap: pretty; }"
+    },
+    {
+      "name": "Answer Option",
+      "kind": "custom",
+      "refersTo": "option",
+      "description": "Full-width answer; the picked state takes the major color (DGA shown).",
+      "html": "<div class=\"ds-options\"><button class=\"ds-option\">หยิบชอล์กขึ้นมาแล้วลงสีบนกำแพง</button><button class=\"ds-option ds-picked\" style=\"--pick:#ff5d8f\">ตะโกนเรียกคนในเมืองให้มารวมกันที่จัตุรัส</button></div>",
+      "css": ".ds-options { display: grid; gap: 10px; } .ds-option { text-align: left; width: 100%; font: 400 16px/1.65 'IBM Plex Sans Thai', sans-serif; color: var(--ink, #f4f1ea); background: var(--fill, rgba(255,255,255,0.05)); border: 1px solid var(--line, rgba(255,255,255,0.14)); border-radius: 14px; padding: 14px 16px; cursor: pointer; transition: background .2s ease, border-color .2s ease, transform .15s ease; } .ds-option:hover { background: var(--fill-hover, rgba(255,255,255,0.1)); border-color: var(--line-strong, rgba(255,255,255,0.35)); transform: translateX(4px); } .ds-option:focus-visible { outline: 2px solid var(--glow, #ffe9a8); outline-offset: 2px; } .ds-picked { border-color: var(--pick); background: color-mix(in srgb, var(--pick) 22%, transparent); }"
+    },
+    {
+      "name": "Choice Chip",
+      "kind": "chip",
+      "refersTo": "chip",
+      "description": "Form choice toggle; the selected chip fills with lamp glow.",
+      "html": "<div class=\"ds-chips\"><button class=\"ds-chip\" aria-pressed=\"true\">ม.5</button><button class=\"ds-chip\" aria-pressed=\"false\">ม.6</button></div>",
+      "css": ".ds-chips { display: flex; flex-wrap: wrap; gap: 8px; } .ds-chip { min-height: 44px; font: 400 15px 'IBM Plex Sans Thai', sans-serif; color: var(--ink, #f4f1ea); background: var(--fill, rgba(255,255,255,0.05)); border: 1px solid var(--line, rgba(255,255,255,0.14)); border-radius: 99px; padding: 6px 16px; cursor: pointer; transition: background .2s ease, border-color .2s ease; } .ds-chip:hover { background: var(--fill-hover, rgba(255,255,255,0.1)); border-color: var(--line-strong, rgba(255,255,255,0.35)); } .ds-chip:focus-visible { outline: 2px solid var(--glow, #ffe9a8); outline-offset: 2px; } .ds-chip[aria-pressed=true] { background: var(--glow, #ffe9a8); color: var(--on-glow, #1a1530); border-color: var(--glow, #ffe9a8); }"
+    },
+    {
+      "name": "Text Field",
+      "kind": "input",
+      "refersTo": "input-text",
+      "description": "Optional form field with a lamp caret and focus ring.",
+      "html": "<label class=\"ds-field\"><span class=\"ds-field-l\">ชื่อเล่นของเธอ</span><input class=\"ds-input\" type=\"text\"></label>",
+      "css": ".ds-field { display: block; color: var(--ink, #f4f1ea); font: 400 17px/1.65 'IBM Plex Sans Thai', sans-serif; } .ds-field-l { display: block; font-weight: 500; margin-bottom: 8px; } .ds-input { width: 100%; min-height: 48px; font: inherit; color: var(--ink, #f4f1ea); caret-color: var(--glow, #ffe9a8); background: var(--fill-input, rgba(255,255,255,0.06)); border: 1px solid var(--line, rgba(255,255,255,0.14)); border-radius: 12px; padding: 10px 14px; } .ds-input:focus { outline: 2px solid var(--glow, #ffe9a8); outline-offset: 1px; } .ds-input[aria-invalid=true] { border-color: var(--danger, #ffa3b8); }"
+    },
+    {
+      "name": "HUD Meter",
+      "kind": "nav",
+      "refersTo": "hud",
+      "description": "Fixed top progress strip; the fill is all five major colors as one gradient.",
+      "html": "<div class=\"ds-hud\"><span>บทที่ 2 ปัญหาของชาวเมือง</span><span class=\"ds-hud-n\">4/11</span><div class=\"ds-meter\"><div class=\"ds-meter-fill\"></div></div></div>",
+      "css": ".ds-hud { display: grid; grid-template-columns: 1fr auto; column-gap: 12px; row-gap: 6px; padding: 12px 16px 10px; font: 400 13px/1.4 'IBM Plex Sans Thai', sans-serif; color: var(--ink-dim, #b9b4c7); background: linear-gradient(#0d0b1a, rgba(13,11,26,0)); } .ds-hud-n { font-variant-numeric: tabular-nums; } .ds-meter { grid-column: 1 / -1; height: 6px; border-radius: 99px; background: var(--track, rgba(255,255,255,0.1)); overflow: hidden; } .ds-meter-fill { height: 100%; width: 36%; background: linear-gradient(90deg, #ff5d8f, #ffb627, #3ddc97, #4cc9f0, #9b5de5); transition: width 0.8s cubic-bezier(.2,.8,.2,1); }"
+    },
+    {
+      "name": "Story Caption Sticker",
+      "kind": "custom",
+      "refersTo": "story-sticker",
+      "description": "Signature: lamp-glow caption leaning -3 degrees, wrapped by Thai phrase. The text shown is a layout sample, not story copy.",
+      "html": "<p class=\"ds-sticker\"><span class=\"ds-phrase\">ตัวอย่างข้อความ</span> <span class=\"ds-phrase\">สำหรับดูการตัดบรรทัด</span></p>",
+      "css": ".ds-sticker { width: min(84%, 480px); margin: 24px auto; padding: 16px 18px; border-radius: 16px; background: var(--glow, #ffe9a8); color: var(--on-glow, #1a1530); font: 500 clamp(18px, 5vw, 22px)/1.65 'Mitr', sans-serif; text-wrap: pretty; box-shadow: 0 8px 20px -8px rgba(0,0,0,0.7); transform: rotate(-3deg); animation: ds-sticker-in .55s cubic-bezier(.16,1,.3,1) both; } .ds-phrase { display: inline-block; max-width: 100%; } @keyframes ds-sticker-in { from { opacity: 0; transform: rotate(-9deg) scale(.86) translateY(14px); } } @keyframes ds-fade { from { opacity: 0; } } @media (prefers-reduced-motion: reduce) { .ds-sticker { animation: ds-fade .2s ease both; } }"
+    },
+    {
+      "name": "Story Picked Chip",
+      "kind": "custom",
+      "refersTo": "story-pick",
+      "description": "The player's answer replayed in the story, outlined in its major color (IGD shown), leaning +2 degrees.",
+      "html": "<p class=\"ds-pick\" style=\"--c:#3ddc97\"><span class=\"ds-phrase\">ถามดวงไฟว่าเมืองนี้มีกติกาอะไร</span> <span class=\"ds-phrase\">แล้วจะผ่านด่านไปได้ยังไง</span></p>",
+      "css": ".ds-pick { width: fit-content; max-width: min(76%, 420px); margin: 24px auto; padding: 12px 16px; border-radius: 12px; background: rgba(13,11,26,.88); border: 1px solid var(--c); color: var(--ink, #f4f1ea); font: 400 15px/1.75 'IBM Plex Sans Thai', sans-serif; text-wrap: pretty; transform: rotate(2deg); } .ds-phrase { display: inline-block; max-width: 100%; }"
+    },
+    {
+      "name": "Major Tag",
+      "kind": "chip",
+      "refersTo": "result-major",
+      "description": "Result tag washed and outlined in the major's color (AFX shown).",
+      "html": "<span class=\"ds-major\" style=\"--c:#4cc9f0\">เรียนได้ที่ สาขา Computer Animation and Visual Effects</span>",
+      "css": ".ds-major { display: inline-block; font: 500 14px 'Mitr', sans-serif; color: var(--ink, #f4f1ea); padding: 4px 12px; border-radius: 99px; background: color-mix(in srgb, var(--c) 25%, transparent); border: 1px solid var(--c); }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Last Lit Night",
+    "overview": "Imagine City is a night city drawn entirely in code, and the interface is something you read over that city, never in front of it. The canvas carries the world: an indigo-to-coral sky, a moon, three layers of towers with flickering windows, a drifting guide orb, and a fog that pools at street level. The city starts drained of color. Global saturation climbs with every scored answer, and each answer also paints one front tower in the chosen major's color at full strength, so by the result the skyline is the player's own palette.\n\nThe UI on top is quiet and translucent: dark panels at 90% opacity, hairline borders, one warm lamp-yellow accent, and two Thai typefaces with distinct jobs. Between questions, a story player takes the whole screen. It has segmented progress bars, the orb and speaker name, the player's own answer as a slightly tilted dark chip outlined in its major color, and a lamp-yellow caption sticker tilted the other way. The camera dollies toward the freshly painted tower while the story runs.\n\nThe world is dark only, by design (`color-scheme: dark`; `theme-color` matches night). It is phone-first and Thai-first: type sizes, leading, wrapping and touch targets are tuned for Thai script on a small screen.",
+    "keyCharacteristics": [
+      "Code-drawn canvas city as the full-bleed background on every screen; no raster art.",
+      "Color is earned: the city goes from gray to full color with progress, and answers paint towers in major colors.",
+      "Dark translucent panels, hairline borders, one lamp-yellow accent.",
+      "Mitr speaks (headings, buttons, captions, names); IBM Plex Sans Thai reads (body, options, fields).",
+      "Thai-safe typesetting: generous leading and phrase-level wrapping.",
+      "Motion rises, settles, and dollies; reduced motion swaps every movement for a short fade and lets the canvas stop."
+    ],
+    "rules": [
+      {
+        "name": "The Earned Color Rule",
+        "body": "The city starts gray, and color comes back only through answers: saturation tracks progress, and each answer paints one tower at full strength, even while the rest of the city is still gray. Major colors carry major meaning and nothing else. Never use them as decoration.",
+        "section": "colors"
+      },
+      {
+        "name": "The One Lamp Rule",
+        "body": "Lamp Glow is the interface's only accent. Anything the player should press next, or anything that confirms what they chose, is lit by it. No second UI accent exists.",
+        "section": "colors"
+      },
+      {
+        "name": "The Single Source Rule",
+        "body": "Major colors are read from `MAJORS` at runtime. A major color typed into CSS or markup is a bug.",
+        "section": "colors"
+      },
+      {
+        "name": "The Two Voices Rule",
+        "body": "Mitr speaks: headings, buttons, captions, speaker names, major tags. Plex Sans Thai reads: body, options, chips, fields. Don't swap their jobs.",
+        "section": "typography"
+      },
+      {
+        "name": "The Thai Leading Rule",
+        "body": "Running Thai text and captions never go below 1.65 line-height (1.75 for the 15px story chip), so stacked vowels and tone marks never collide. Headings sit at 1.3 with balanced wrapping. Only the single-line HUD goes tighter (1.4).",
+        "section": "typography"
+      },
+      {
+        "name": "The Phrase Wrap Rule",
+        "body": "Thai has no spaces between words, so story captions and the picked-answer chip are split on spaces into inline-block phrases. Lines break only between phrases, never mid-word. A phrase longer than the line wraps inside its own box.",
+        "section": "typography"
+      },
+      {
+        "name": "The Night Is the Depth Rule",
+        "body": "Cards and panels never take shadows. They separate from the city by opacity and a hairline. Lift is reserved for things the hand touches: a hovered button and the sticker.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do let the canvas city sit behind every screen, and keep UI surfaces translucent (panel at 90%, night scrims at 0.7–0.88) so it reads through.",
+      "Do read major colors from `MAJORS` and pass them through `--c` or `--pick`.",
+      "Do use lamp glow for the next action, the current selection and focus. Use on-glow for text on it.",
+      "Do keep running Thai text at 1.65 line-height or more, and wrap story text by phrase.",
+      "Do set headings, buttons and captions in Mitr 500, and reading text in IBM Plex Sans Thai.",
+      "Do keep touch targets at least 44px, and 48px for primary actions and inputs.",
+      "Do pair every movement with its reduced-motion fade, and let the canvas loop stop when idle.",
+      "Do show a labeled placeholder wherever story copy is missing."
+    ],
+    "donts": [
+      "Don't add a light theme. The world is a night city, and `color-scheme` stays dark.",
+      "Don't use major colors for decoration, or for anything that doesn't mean that major.",
+      "Don't introduce a second UI accent next to lamp glow.",
+      "Don't put shadows on cards or panels. Lift is only for hovered buttons and the sticker.",
+      "Don't desaturate the city with a full-screen CSS filter. Saturation is blended inside the canvas.",
+      "Don't let Thai lines break mid-word in captions, or drop multi-line Thai below 1.65 leading.",
+      "Don't invent SDM logos, official names or official colors before the brand assets are supplied.",
+      "Don't write story copy into the sticker. Cutscene text comes only from the client's brief."
+    ],
+    "openItems": [
+      "Official SDM brand assets (logo, colors, official faculty and university name) have not been supplied; no brand tokens are recorded.",
+      "Cutscene copy is pending from the client's brief; the story sticker shows a provisional labeled placeholder (panel fill, dim ink, dashed line-strong border, Plex 400 15px/1.5) until it arrives."
+    ]
+  }
+}
