@@ -1,4 +1,4 @@
-graft/
+/graft/
 .playwright-mcp/
 .impeccable/config.local.json
 .claude/

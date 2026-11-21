@@ -11,13 +11,13 @@ Scope: the whole quiz flow, intro → 11 scored scenes + districts → form → 
 
 Audience and job: Thai ม.4–ปวส. students from social apps; finish the story, see which SDM major fits, leave contact, share.
 
-Constraints: scoring, major results, the traveler-pass form and lead sending stay as built. Every answer plays a story-style cutscene before the next question (user-locked structure). Cutscene text comes from the brief document the user holds; never invent it. Character and scene illustrations are drawn by the user's team; the build ships labeled art slots and never copies the reference image's character or artwork.
+Constraints: scoring, major results, the traveler-pass form and lead sending stay as built. No cutscenes between questions (removed by the user on 2026-11-21): an answer paints a building, the camera looks at it briefly, then the next question appears. Story text comes from the brief document the user holds; never invent it. Character and scene illustrations are drawn by the user's team; the build ships labeled art slots and never copies the reference image's character or artwork.
 
 Visual direction: pinned by the user on 2026-11-12 with a reference image ("อยากได้สไตล์นี้"), replacing the night-city look. The pin beats any roll.
 
 Memorable moment: the city starts as black-and-white manga line art; each answer lays down color until the result screen is in full pink and mint.
 
-Unresolved: cutscene script; team illustrations (hero, five result characters, optional cutscene panels); official SDM brand assets.
+Unresolved: team illustrations (hero, five result characters); official SDM brand assets.
 
 ## Direction contract
 
@@ -29,6 +29,6 @@ STORY: The player sees a colorless line-art city, answers, and watches color arr
 
 FIRST VIEWPORT: Cover screen. Bracketed italic title top-left, one line of story under it, the team's hero illustration slot filling the middle over the line-art city, black START-style button at the bottom center.
 
-FORM: User-pinned style reference (anime zine with HUD framing) over the locked story-frames structure; signature interaction: line art to color, with an 11-segment meter where each segment takes the answered major's color. seed: none (unavailable)
+FORM: User-pinned style reference (anime zine with HUD framing) over a quiz with no cutscenes between questions; signature interaction: line art to color, with an 11-segment meter where each segment takes the answered major's color. seed: none (unavailable)
 
 FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, DESIGN.md, and every shipping raster carrying its provenance

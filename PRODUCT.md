@@ -26,7 +26,7 @@ The quiz is a story, not a survey. The player is the last person who can bring t
 
 ## Operating Context
 
-- Format (confirmed 2026-11-12): still a quiz, but every answer, including district picks, plays its own short cutscene (2–3 story-style frames, tap to advance) before the next question. All answers share one story spine; the ending differs by major result. Cutscenes are code-drawn in the city. Their text comes from the brief document, which the user holds and hasn't supplied yet.
+- Format (changed 2026-11-21): still a quiz, and the user removed the cutscenes between questions. After each answer, including district picks, one building is painted in the answer's major color and the camera zooms in on it for about 0.9s, then the next question appears. The story is carried by the chapter cards, the scene prompts, and the city itself. All answers share one story spine; the ending differs by major result.
 - Flow: intro → how-to → 5 chapters with 11 scored scenes → Chapter 3 branches into the player's leading "district" (or the top two if they're within 1 point) → the gate scene → optional traveler-pass form (every field can be skipped) → result.
 - Majors: DGA Digital Arts, DGD Digital Graphic Design, IGD Interactive and Game Design, AFX Computer Animation and Visual Effects, DEN Digital Entertainment. Each major has a fixed signature color that appears in both the city and the results.
 - Results: a single major, or a mixed result with its own title (MIXED in `data.js`) when the runner-up is within 1 point. Ties are broken by the answer to scene 5.2.
@@ -62,5 +62,5 @@ The quiz is a story, not a survey. The player is the last person who can bring t
 
 ## Accessibility & Inclusion
 
-- Respect `prefers-reduced-motion`: cards and cutscene stickers switch to short fades, and the city's color still returns, quickly (about 250ms). There are no particles or camera movement, and the canvas stops drawing when nothing changes. Cutscenes still auto-advance, and they can always be paused, skipped, or advanced with the keyboard.
+- Respect `prefers-reduced-motion`: cards switch to short fades, and the city's color still returns, quickly (about 250ms). There are no particles, rain or camera movement, and the canvas stops drawing when nothing changes. The pause after an answer shortens to about 0.3s.
 - Every form field can be skipped. Answers are never framed as right or wrong.
