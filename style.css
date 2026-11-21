@@ -264,30 +264,18 @@ p, li { text-wrap: pretty; }
 /* ยังไม่มีภาพปก: ยุบช่องภาพ แล้วรวบหัวปกกับท้ายปกไว้กลางจอ */
 .cover:has(> .art.absent) { grid-template-rows: auto auto; align-content: center; gap: 28px; }
 .cover > .art.absent { display: none; }
-/* หน้าแรกเป็นขาวดำ (เมือง ภาพ ตัวหนังสือ ปุ่ม) เว้นตัวไกด์บน #fx ที่มีสีอยู่ตัวเดียว
-   หลังจากนั้นการ์ดกับปุ่มค่อย ๆ ได้สีคืนตามคำตอบ (--mono จาก city.js: 1 → 0)
-   ยกเว้นปุ่มคำตอบ (.options) กับแถบความคืบหน้าบน HUD ที่มีสีเต็มเสมอ: ฟิลเตอร์ของพ่อแม่ถอนที่ลูกไม่ได้
-   การ์ดที่มีปุ่มคำตอบจึงกรองลูกทีละชิ้นแทน (ตัวการ์ดเองเป็นขาว/หมึกอยู่แล้ว)
-   ตัวเมืองเติมสีเองอยู่แล้วตามความคืบหน้า จึงไม่กรองซ้ำ */
-#stage > :not(:has(> .options)),
+/* การ์ดควิซค่อย ๆ คืนสีตามคำตอบ โดยปุ่มคำตอบมีสีเสมอ */
+#stage > :not(.cover):not(:has(> .options)),
 #stage > :has(> .options) > :not(.options) { filter: grayscale(var(--mono, 1)); }
-body:has(.cover) #city { filter: grayscale(1); }
-/* หน้าปกเป็นใบปิด: เมืองยังเทา แต่หัวปกมีชมพู/มินต์ของแบรนด์ */
-#stage > .cover { filter: none; }
+/* เก็บสีไว้เพียงเล็กน้อยบนหน้าปก ก่อนเริ่มคืนสีให้เมือง */
+body:has(.cover) #city, .cover > .art, .cover-story { filter: saturate(.08); }
 /* หัวปกแบบโลโก้เกม: ทั้งก้อนอยู่กลางจอ แต่ข้างในชิดซ้าย หัวเรื่องเหลี่ยมเอียง ใต้หัวเป็นบล็อกตัว mono */
 .cover-head { position: relative; isolation: isolate; width: fit-content; max-width: 100%; margin: 14px auto 0; padding: 10px 4px 4px; text-align: left; }
 /* รอยแปรงชมพูหลังปลายหัวเรื่องฝั่งขวา กับรอยมินต์ที่มุมล่างซ้าย (สีแบรนด์ ไม่ใช่สีสาขา) */
 .cover-head .splash {
-  position: absolute; z-index: -1; right: -10%; top: -6%; width: 58%; height: 96%;
-  background: var(--pink); transform: rotate(-6deg);
-  clip-path: polygon(14% 10%, 40% 0, 70% 8%, 100% 2%, 94% 34%, 100% 66%, 82% 100%, 52% 88%, 22% 96%, 0 74%, 8% 46%, 0 22%);
+  position: absolute; z-index: -1; inset: -11% -8% -5%; pointer-events: none;
+  background: url("assets/title-splash.svg") center / 100% 100% no-repeat;
   animation: chip-in .7s var(--ease-out) both;
-}
-.cover-head::before {
-  content: ""; position: absolute; z-index: -1; left: -8%; bottom: 4%; width: 34%; height: 20%;
-  background: var(--mint); transform: skewX(-24deg) rotate(-4deg);
-  clip-path: polygon(0 30%, 30% 0, 100% 12%, 88% 70%, 100% 100%, 12% 86%);
-  animation: chip-in .7s .1s var(--ease-out) both;
 }
 /* มุมกรอบหนาแบบเป้าเล็ง: ซ้ายบนกับขวาล่าง (ขวาล่างคือตัวเดียวกันหมุน 180°) */
 .cover-head .corner {
@@ -409,6 +397,29 @@ body:has(.cover) #city { filter: grayscale(1); }
 .options.locked .option:not(.picked) { opacity: .4; transform: none; background: var(--panel); }
 .option.picked { border-width: 3px; padding: 11px 13px 11px 15px; box-shadow: 4px 4px 0 var(--pick, var(--ink)); }
 .options.locked .option:not(.picked) { box-shadow: 2px 2px 0 var(--line); }
+/* หลังเลือก: แถวเด้งรับ + คลื่นสีจากจุดที่แตะ + แสงวาบกวาดผ่าน */
+.option { position: relative; overflow: hidden; isolation: isolate; }
+.option.picked { animation: pick-pop .34s var(--ease-out); }
+.option.picked::after {
+  content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  background: linear-gradient(100deg, transparent 30%, rgb(255 255 255 / .7) 50%, transparent 70%);
+  transform: translateX(-110%); animation: pick-shine .55s .1s ease-out forwards;
+}
+.option .ripple {
+  position: absolute; z-index: -1; width: 24px; height: 24px; margin: -12px 0 0 -12px; border-radius: 50%;
+  background: var(--pick); pointer-events: none; animation: ripple .5s ease-out forwards;
+}
+@keyframes pick-pop { 0% { transform: scale(1); } 35% { transform: scale(.97, .94); } 70% { transform: scale(1.025); } 100% { transform: none; } }
+@keyframes pick-shine { to { transform: translateX(110%); } }
+@keyframes ripple { from { opacity: .55; transform: scale(0); } to { opacity: 0; transform: scale(22); } }
+/* ชิปสีที่บินไปลงตัวนับ */
+.fly-chip {
+  position: fixed; left: 0; top: 0; z-index: 60; width: 14px; height: 14px; pointer-events: none;
+  border: 2px solid var(--ink); border-radius: 3px; will-change: transform;
+}
+.meter i.on.pending { background: transparent; box-shadow: none; animation: none; }
+.meter i.on.hit { animation: seg-hit .5s var(--ease-out); }
+@keyframes seg-hit { 0% { filter: brightness(1.8); transform: scaleY(1.9); } 60% { filter: brightness(1.2); } 100% { filter: none; transform: none; } }
 @keyframes opt-in { from { opacity: 0; transform: translateX(-14px); } }
 
 /* ---------- Form ---------- */
@@ -588,7 +599,8 @@ input[aria-invalid=true] { border: 2.5px solid var(--danger); background: color-
 /* ลดการเคลื่อนไหว: เปลี่ยนเป็นจางเข้าออกสั้น ๆ แทนการเลื่อน ยังเห็นว่าเปลี่ยนฉาก */
 @media (prefers-reduced-motion: reduce) {
   .card, .cover, .card.chapter:not(.leaving) { animation: fade-in .2s ease both; }
-  .meter i.on, .option { animation: none; }
+  .meter i.on, .option, .option.picked, .meter i.on.hit { animation: none; }
+  .option.picked::after { display: none; }
   .cover-head .splash { animation: none; }
   .cover h1 .ln, .cover-story, .cover-head::before, .cover-head .kicker, .cover-head .corner { animation: none; }
   .card.leaving, .cover.leaving { animation: fade-out .15s ease forwards; }
@@ -610,7 +622,7 @@ input[aria-invalid=true] { border: 2.5px solid var(--danger); background: color-
 
 /* ---------- ลูกโป่งคำพูดของไกด์ (city.js วางตำแหน่งตามตัวไกด์ทุกเฟรม) ---------- */
 .guide-say {
-  position: fixed; left: 0; top: 0; z-index: 4; pointer-events: none;
+  position: fixed; left: 0; top: 0; z-index: 1; pointer-events: none;
   max-width: min(260px, calc(100vw - 16px)); width: max-content;
   padding: 8px 14px 9px;
   background: var(--panel); color: var(--ink);
@@ -659,21 +671,48 @@ html.guide-hot, html.guide-hot body { cursor: pointer; }
 }
 
 /* ---------- ปุ่มเปิด/ปิดเสียง (sfx.js) ---------- */
-.sound-toggle {
+.sound-controls {
   position: fixed; z-index: 5;
   right: max(12px, env(safe-area-inset-right)); bottom: max(12px, env(safe-area-inset-bottom));
+  display: flex; align-items: center; gap: 10px; padding-right: 12px;
+  background: var(--panel); border: 2px solid var(--ink); border-radius: 6px;
+  box-shadow: 3px 3px 0 var(--ink);
+}
+.sound-controls input[type=range] {
+  --rail: linear-gradient(to right, var(--mint) var(--volume), var(--paper) var(--volume));
+  appearance: none; width: clamp(82px, 10vw, 114px); height: 44px; min-height: 0;
+  margin: 0; padding: 0; border: 0; background: transparent; cursor: pointer;
+}
+.sound-controls input::-webkit-slider-runnable-track {
+  height: 10px; border: 2px solid var(--ink); border-radius: 3px; background: var(--rail);
+}
+.sound-controls input::-moz-range-track {
+  box-sizing: border-box; height: 10px; border: 2px solid var(--ink); border-radius: 3px; background: var(--rail);
+}
+.sound-controls input::-webkit-slider-thumb {
+  appearance: none; width: 14px; height: 22px; margin-top: -8px;
+  border: 2px solid var(--ink); border-radius: 3px; box-shadow: 2px 2px 0 var(--ink);
+  background: linear-gradient(var(--ink) 0 0) center / 2px 8px no-repeat var(--panel);
+}
+.sound-controls input::-moz-range-thumb {
+  box-sizing: border-box; width: 14px; height: 22px;
+  border: 2px solid var(--ink); border-radius: 3px; box-shadow: 2px 2px 0 var(--ink);
+  background: linear-gradient(var(--ink) 0 0) center / 2px 8px no-repeat var(--panel);
+}
+.sound-controls input:focus { outline: none; }
+.sound-controls input:focus-visible { outline: var(--focus); outline-offset: -3px; }
+.sound-toggle {
   width: 44px; height: 44px; display: grid; place-items: center; padding: 0; cursor: pointer;
-  color: var(--ink); background: var(--panel);
-  border: 2px solid var(--ink); border-radius: 50%; box-shadow: 3px 3px 0 var(--ink);
-  transition: transform .15s ease, box-shadow .15s ease;
+  color: var(--panel); background: var(--ink);
+  border: 0; border-radius: 3px 0 0 3px;
 }
 .sound-toggle svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
 .sound-toggle svg path:first-child { fill: currentColor; }
-.sound-toggle[aria-pressed=true] { background: color-mix(in srgb, var(--mint) 30%, var(--panel)); }
+.sound-toggle .waves { stroke: var(--mint); }
 .sound-toggle[aria-pressed=true] .cross, .sound-toggle[aria-pressed=false] .waves { display: none; }
 .sound-toggle:focus-visible { outline: var(--focus); outline-offset: 3px; }
-.sound-toggle:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
-@media (hover: hover) { .sound-toggle:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--ink); } }
+.sound-toggle:active svg { transform: translateY(1px); }
+@media (hover: hover) { .sound-toggle:hover { background: var(--ink-dim); } }
 
 /* ---------- ธีมตัวละคร (หน้าผลลัพธ์) ----------
    app.js ใส่ html.themed + --theme (สีหลักตัวละคร) + --theme2 (ตัวที่สองของผลผสม)
@@ -688,7 +727,7 @@ html.themed {
   position: fixed; inset: 0; z-index: 1; pointer-events: none;
   opacity: 0; mix-blend-mode: multiply;
 }
-/* สีตัวละครกระจายออกจากป้ายสาขาเหมือนหมึกหก แล้วพื้นหลังยังขยับช้า ๆ ต่อ */
+/* สีตัวละครแผ่ออกจากกลางจอ แล้วพื้นหลังยังขยับช้า ๆ ต่อ */
 html.themed .theme-wash {
   opacity: 1;
   background: linear-gradient(to bottom,
@@ -699,10 +738,9 @@ html.themed .theme-wash {
   animation: wash-in 1.8s cubic-bezier(.22, .8, .24, 1) both, wash-tide 9s 1.8s ease-in-out infinite alternate;
 }
 @keyframes wash-in {
-  /* --ox/--oy: จุดที่สีเริ่มกระจาย (app.js ตั้งเป็นตำแหน่งป้ายสาขาที่เพิ่งประทับ) */
-  from { clip-path: circle(0 at var(--ox, 50%) var(--oy, 60%)); filter: saturate(1.8) brightness(1.1); }
+  from { clip-path: circle(0% at 50% 50%); filter: saturate(1.8) brightness(1.1); }
   60% { filter: saturate(1.3); }
-  to { clip-path: circle(150vmax at var(--ox, 50%) var(--oy, 60%)); filter: none; }
+  to { clip-path: circle(71% at 50% 50%); filter: none; }
 }
 /* สีไหลขึ้นลงเบา ๆ เหมือนแสงเวทีที่ยังส่องอยู่ */
 @keyframes wash-tide { from { background-position: 0 0; } to { background-position: 0 100%; } }

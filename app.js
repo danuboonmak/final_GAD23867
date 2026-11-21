@@ -180,7 +180,7 @@ function artSlot(src, what, size, cls = "") {
 // ---------- ไกด์ ----------
 // ไกด์ลอยไปข้างการ์ดตรงกับสิ่งที่เธอชี้หรือโฟกัสอยู่ (ตัวเลือก ชิป ปุ่ม)
 const ATTEND = ".option, .chip, .btn, .card input, .card select, .card textarea";
-const attendable = n => n instanceof Element && n.closest(ATTEND) && !n.closest(".options.locked");
+const attendable = n => n instanceof Element && !n.closest(".options.locked") ? n.closest(ATTEND) : null;
 stage.addEventListener("pointerover", e => { const n = attendable(e.target); if (n) City.attend(n); });
 stage.addEventListener("pointerout", e => { if (attendable(e.target) && !attendable(e.relatedTarget)) City.attend(null); });
 stage.addEventListener("focusin", e => { const n = attendable(e.target); City.attend(n || null); });
@@ -306,12 +306,44 @@ function paintThen(color, from) {
   const card = stage.firstElementChild;
   if (card) card.classList.add("leaving");
   City.focus(x, 1.1);
-  setTimeout(() => City.say(pickLine(CHEER), 1300), reduceMotion() ? 0 : 480);
+  // ตอบสีเดิมติดกัน ไกด์นับให้ (ไม่ใช่ถูก/ผิด แค่สนุก)
+  const st = state.streak && state.streak.c === color ? state.streak.n + 1 : 1;
+  state.streak = { c: color, n: st };
+  const line = st >= 2 ? `สีนี้อีกแล้ว! ×${st}` : pickLine(CHEER);
+  setTimeout(() => City.say(line, 1300), reduceMotion() ? 0 : 480);
   setTimeout(() => {
     City.focus(0.5, 1);
     const go = () => (busy ? setTimeout(go, 50) : next());
     go();
   }, reduceMotion() ? 300 : 950);
+}
+
+// ชิปสีบินโค้งจากคำตอบไปลงช่องของตัวนับ แล้วช่องนั้นค่อยเด้งรับสี (ไม่บังอะไร ไม่ต้องรอ)
+function flyChip(color, x0, y0, seg) {
+  if (reduceMotion() || !seg.animate) return;
+  const t = seg.getBoundingClientRect();
+  if (!t.width) return;
+  seg.classList.add("pending");
+  const chip = document.body.appendChild(el("i", { class: "fly-chip", "aria-hidden": "true" }));
+  chip.style.background = color;
+  const dx = t.left + t.width / 2 - x0, dy = t.top + t.height / 2 - y0;
+  const lift = Math.min(120, Math.abs(dy) * 0.4 + 40);
+  const at = (k, s, rot) => `translate(${x0 + dx * k}px, ${y0 + dy * k - Math.sin(Math.PI * k) * lift}px) translate(-50%, -50%) scale(${s}) rotate(${rot}deg)`;
+  const anim = chip.animate([
+    { transform: at(0, 0.4, 0), opacity: 0 },
+    { transform: at(0.15, 1.15, 40), opacity: 1, offset: 0.12 },
+    { transform: at(0.5, 1, 160) },
+    { transform: at(0.85, 0.8, 300) },
+    { transform: at(1, 0.55, 360), opacity: 0.9 },
+  ], { duration: 560, easing: "cubic-bezier(.45,0,.3,1)" });
+  const land = () => {
+    chip.remove();
+    seg.classList.remove("pending");
+    seg.classList.remove("hit"); void seg.offsetWidth; seg.classList.add("hit");
+    sfx("bubble", segs.indexOf(seg));
+  };
+  anim.onfinish = land;
+  anim.oncancel = land;
 }
 
 function choiceList(options, onPick, colorOf, labelId, onDone) {
@@ -332,8 +364,18 @@ function choiceList(options, onPick, colorOf, labelId, onDone) {
       b.lastChild.replaceWith(tick());
       sfx("pick", color);
       const r = b.getBoundingClientRect();
-      City.burst(ev.clientX || r.left + r.width / 2, ev.clientY || r.top + r.height / 2, color);
+      const px = ev.clientX || r.left + r.width / 2, py = ev.clientY || r.top + r.height / 2;
+      City.burst(px, py, color);
+      if (!reduceMotion()) {
+        // คลื่นสีกระจายจากจุดที่แตะในแถวคำตอบ
+        const rp = el("i", { class: "ripple", "aria-hidden": "true" });
+        rp.style.left = `${px - r.left}px`; rp.style.top = `${py - r.top}px`;
+        b.append(rp);
+      }
+      const before = segs.filter(s => s.classList.contains("on"));
       onPick(opt);
+      const seg = segs.find(s => s.classList.contains("on") && !before.includes(s));
+      if (seg) flyChip(color, px, py, seg);
       setTimeout(() => onDone(opt, color, b), 400);
     });
     box.append(b);
@@ -771,18 +813,12 @@ function resultSounds(card, codes) {
   majors.forEach((m, i) => later(md + 620 + i * 140, () => sfx("stamp", colors[i] || colors[0])));
 }
 
-// สีตัวละครกระจายจากป้ายสาขาออกไปทั้งจอ + สีพุ่ง เสียงขยาย ไกด์ดีใจ
-function themeSpread(card, codes) {
-  const mb = [...card.querySelectorAll(".result-major")].pop() || card;
-  const r = mb.getBoundingClientRect();
-  const x = r.left + r.width / 2, y = r.top + r.height / 2;
-  const root = document.documentElement.style;
-  root.setProperty("--ox", `${Math.round(x)}px`);
-  root.setProperty("--oy", `${Math.round(y)}px`);
+// สีตัวละครกระจายจากกลางจอพร้อมเสียงและประกายสี
+function themeSpread(codes) {
   setTheme(codes);
   const colors = codes.map(c => CHAR_COLOR[c]);
   sfx("swell", colors);
-  City.burst(x, y, colors[0], 40);
+  City.burst(innerWidth / 2, innerHeight / 2, colors[0], 40);
   later(250, () => City.celebrate(colors));
   later(900, () => City.say("สีของเธอเต็มเมืองแล้ว!", 2400));
 }
@@ -831,7 +867,7 @@ function resultCard(codes) {
   // พื้นหลังเปลี่ยนเป็นสีตัวละครหลังการ์ดเผยผลครบ (ป้ายสาขาประทับเสร็จ) ไม่แย่งจังหวะบอกผล
   const mb = card.querySelector(".result-major");
   const stampAt = parseFloat((mb && mb.closest(".result-block").style.getPropertyValue("--d")) || 1.6) * 1000 + 700;
-  later(reduceMotion() ? 500 : stampAt + 350, () => themeSpread(card, codes));
+  later(reduceMotion() ? 500 : stampAt + 350, () => themeSpread(codes));
   const fit = () => fitLine(name);
   setTimeout(() => document.fonts.ready.then(fit), reduceMotion() ? 160 : 320);
   const onResize = () => (name.isConnected ? fit() : removeEventListener("resize", onResize));

@@ -50,6 +50,8 @@ const City = (() => {
   guide.src = "assets/guide.webp";
   const guideReady = () => guide.complete && guide.naturalWidth > 0;
   let comets = [];
+  let rings = [];
+  const RING_MS = 620;
   let cheer = null;   // { idx, start, until }
   let spinAt = -1e9;
   const SPIN_MS = 1000;
@@ -106,9 +108,9 @@ const City = (() => {
   const WIN_OFF = ["#dcd8e4", "#cdc8d7", "#bdb8c9"];
   const WIN_ON = ["#a39db3", "#7f7992", "#514b63"];
   const WIN = [
-    { sx: 3, sy: 6, dx: 7, dy: 10, p: 0.62 },
-    { sx: 5, sy: 7, dx: 11, dy: 14, p: 0.55 },
-    { sx: 7, sy: 9, dx: 14, dy: 18, p: 0.5 },
+    { sx: 3, sy: 6, dx: 16, dy: 22, p: 0.32 },
+    { sx: 5, sy: 7, dx: 18, dy: 22, p: 0.42 },
+    { sx: 7, sy: 9, dx: 19, dy: 24, p: 0.45 },
   ];
 
   // รางโมโนเรล: เอียงขึ้นทางขวาเล็กน้อย ให้ฉากมีมิติ (x เป็นพิกัดจอ)
@@ -150,7 +152,7 @@ const City = (() => {
       ant: 14 + rnd() * 28, antX: 0.25 + rnd() * 0.5,
       wins: [], bill: null, awn: false,
     };
-    if (li === 1 && bw > 44 && rnd() < 0.42) {
+    if (li === 1 && bw > 44 && rnd() < 0.24) {
       const roof = rnd() < 0.5, bbw = Math.min(bw * 0.86, 66);
       b.bill = { roof, bw: bbw, bh: bbw * 0.58, kind: Math.floor(rnd() * 3), col: rnd() < 0.5 ? PINK : MINT };
       if (roof) { b.top = "flat"; b.tip = 0; b.sb = 0; b.inset = 0; }
@@ -195,16 +197,16 @@ const City = (() => {
 
     buildGloom();
 
-    rain = Array.from({ length: Math.round(W * H / 6500) }, () => ({
+    rain = Array.from({ length: Math.min(36, Math.round(W * H / 24000)) }, () => ({
       x: rnd() * (W + 80), y: rnd() * H, len: 18 + rnd() * 30, v: 7 + rnd() * 6, heavy: rnd() < 0.18,
     }));
 
     const cr = Math.min(W, H);
     clouds = [
-      { x: W * 0.08, y: H * 0.1, s: 1, v: 0.006 },
-      { x: W * 0.58, y: H * 0.05, s: 0.7, v: 0.009 },
-      { x: W * 0.32, y: H * 0.31, s: 0.55, v: 0.012 },
-      { x: W * 0.9, y: H * 0.36, s: 0.45, v: 0.014 },
+      { x: W * 0.02, y: H * 0.19, s: 0.84, v: 0.004 },
+      { x: W * 0.45, y: H * 0.12, s: 0.58, v: 0.003 },
+      { x: W * 0.83, y: H * 0.34, s: 0.75, v: 0.005 },
+      { x: W * 0.18, y: H * 0.42, s: 0.52, v: 0.0035 },
     ].map(cl => {
       const base = cr * 0.055 * cl.s;
       const bumps = [];
@@ -220,11 +222,11 @@ const City = (() => {
     fogGrad = c.createLinearGradient(0, H * 0.84, 0, H);
     fogGrad.addColorStop(0, "rgba(244,242,247,0)"); fogGrad.addColorStop(1, "rgba(244,242,247,.55)");
 
-    flock = Array.from({ length: 7 }, (_, i) => ({
+    flock = Array.from({ length: 3 }, (_, i) => ({
       dx: i * 17 + rnd() * 8, dy: (i % 2 ? -1 : 1) * (4 + i * 3) + rnd() * 6, s: 1 - i * 0.07, ph: rnd() * 6.28,
     }));
 
-    petals = Array.from({ length: Math.max(24, Math.min(70, Math.round(W * H / 16000))) }, () => spawnPetal({}, true));
+    petals = Array.from({ length: Math.max(5, Math.min(16, Math.round(W * H / 48000))) }, () => spawnPetal({}, true));
 
     orb.x = W * 0.5; orb.y = orb.gy = H * 0.22;
   }
@@ -232,137 +234,92 @@ const City = (() => {
   // ---------- กระดาษ วงแหวน ไม้บรรทัด เครื่องหมายแผ่นพิมพ์ (นิ่ง) ----------
   function buildPaper() {
     paper = offscreen(W, H);
-    const s = paper.getContext("2d");
-    const g = s.createLinearGradient(0, 0, 0, H);
-    g.addColorStop(0, "#f9f7fc"); g.addColorStop(0.6, "#f1eef5"); g.addColorStop(1, "#e7e3ee");
-    s.fillStyle = g; s.fillRect(0, 0, W, H);
+    const sky = paper.getContext("2d");
+    const gradient = sky.createLinearGradient(0, 0, 0, H);
+    gradient.addColorStop(0, "#dedeea");
+    gradient.addColorStop(0.47, "#f8f4ef");
+    gradient.addColorStop(0.72, "#efe4dc");
+    gradient.addColorStop(1, "#d3cedd");
+    sky.fillStyle = gradient;
+    sky.fillRect(0, 0, W, H);
 
-    // เกรนกระดาษ
-    s.fillStyle = "rgba(60,50,90,.05)";
-    for (let i = 0, n = Math.round(W * H / 220); i < n; i++) s.fillRect(rnd() * W, rnd() * H, 1, 1);
-
-    // ดวงอาทิตย์จาง ๆ หลังวงแหวน ทำเป็นเส้นแนวนอนแบบสกรีนพิมพ์
     const { rx, ry, rr } = ring;
-    s.save();
-    s.beginPath(); s.arc(rx - rr * 0.9, ry + rr * 0.4, rr * 1.15, 0, 6.28); s.clip();
-    s.strokeStyle = "rgba(21,18,28,.09)"; s.lineWidth = 1;
-    s.beginPath();
-    for (let y = ry - rr; y < ry + rr * 2; y += 4) { s.moveTo(rx - rr * 2.2, y + 0.5); s.lineTo(rx + rr, y + 0.5); }
-    s.stroke();
-    s.restore();
+    sky.fillStyle = "#fffbf2";
+    sky.beginPath();
+    sky.arc(rx, ry, rr * 0.82, 0, Math.PI * 2);
+    sky.fill();
+    sky.strokeStyle = "rgba(77,72,89,.36)";
+    sky.lineWidth = 1.5;
+    sky.beginPath();
+    sky.ellipse(rx, ry, rr * 1.2, rr * 0.46, -0.25, 0, Math.PI * 2);
+    sky.stroke();
 
-    // วงแหวนลอยฟ้า: แถบคู่ + ขีดแบ่งช่องรอบวง
-    s.save();
-    s.translate(rx, ry); s.rotate(-0.25);
-    s.strokeStyle = "#b5b0c3"; s.lineWidth = 7;
-    s.beginPath(); s.ellipse(0, 0, rr, rr * 0.62, 0, 0, 6.28); s.stroke();
-    s.strokeStyle = INK; s.lineWidth = 1.2;
-    s.beginPath(); s.ellipse(0, 0, rr + 5, rr * 0.62 + 4, 0, 0, 6.28); s.stroke();
-    s.beginPath(); s.ellipse(0, 0, rr - 5, rr * 0.62 - 4, 0, 0, 6.28); s.stroke();
-    s.lineWidth = 1;
-    s.beginPath();
-    for (let a = 0; a < 6.28; a += Math.PI / 20) {
-      const ca = Math.cos(a), sa = Math.sin(a);
-      s.moveTo(ca * (rr - 5), sa * (rr * 0.62 - 4)); s.lineTo(ca * (rr + 5), sa * (rr * 0.62 + 4));
-    }
-    s.stroke();
-    // วงนอกบาง ๆ แบบแผนผัง
-    s.setLineDash([3, 5]); s.strokeStyle = "rgba(21,18,28,.35)";
-    s.beginPath(); s.ellipse(0, 0, rr * 1.32, rr * 0.82, 0, 0, 6.28); s.stroke();
-    s.setLineDash([]);
-    s.restore();
-
-    // เครื่องหมายกากบาทแบบแผ่นพิมพ์ (บางอันมีวงกลม)
-    s.strokeStyle = "rgba(21,18,28,.45)"; s.lineWidth = 1;
-    const marks = Math.round(W * H / 52000);
-    for (let i = 0; i < marks; i++) {
-      const x = Math.round(rnd() * W) + 0.5, y = Math.round(rnd() * H * 0.6) + 0.5, r = 4 + rnd() * 6;
-      s.beginPath(); s.moveTo(x - r, y); s.lineTo(x + r, y); s.moveTo(x, y - r); s.lineTo(x, y + r); s.stroke();
-      if (rnd() < 0.3) { s.beginPath(); s.arc(x, y, r * 0.6, 0, 6.28); s.stroke(); }
-    }
-
-    // ไม้บรรทัดขอบซ้าย
-    s.strokeStyle = "rgba(21,18,28,.4)";
-    s.beginPath();
-    for (let y = H * 0.1, i = 0; y < H * 0.52; y += 6, i++) {
-      const len = i % 10 === 0 ? 12 : i % 5 === 0 ? 8 : 4;
-      s.moveTo(6, Math.round(y) + 0.5); s.lineTo(6 + len, Math.round(y) + 0.5);
-    }
-    s.moveTo(6.5, H * 0.1); s.lineTo(6.5, H * 0.52);
-    s.stroke();
-
-    // กลุ่มจุดพิกเซล
-    s.fillStyle = "rgba(21,18,28,.5)";
-    for (let k = 0; k < 3; k++) {
-      const ox = W * (0.08 + rnd() * 0.84), oy = H * (0.06 + rnd() * 0.4);
-      for (let i = 0; i < 4; i++) for (let j = 0; j < 3; j++) if (rnd() < 0.62) s.fillRect(ox + i * 6, oy + j * 6, 4, 4);
-    }
+    paintSkySplashes(sky, "#b9c4c2", "#c9bfc5");
   }
 
-  // ---------- พู่กันสีชมพูกับมินต์: โผล่ตามสีที่กลับมา ----------
-  function brush(ctx, x0, y0, x1, y1, wd, color) {
-    const len = Math.hypot(x1 - x0, y1 - y0);
-    ctx.save();
-    ctx.translate(x0, y0); ctx.rotate(Math.atan2(y1 - y0, x1 - x0));
-    ctx.fillStyle = color;
-    // แกนทึบ: หัวพู่กันมน ปลายเรียวแหลม
-    ctx.beginPath();
-    ctx.moveTo(len * 0.04, -wd * 0.36);
-    ctx.quadraticCurveTo(len * 0.5, -wd * 0.46, len * 0.9, -wd * 0.3);
-    ctx.lineTo(len, -wd * 0.05);
-    ctx.lineTo(len * 0.86, wd * 0.34);
-    ctx.quadraticCurveTo(len * 0.45, wd * 0.42, len * 0.06, wd * 0.3);
-    ctx.quadraticCurveTo(-wd * 0.12, 0, len * 0.04, -wd * 0.36);
-    ctx.fill();
-    // ขนพู่กันแห้งที่ขอบ: เส้นบางขาดเป็นช่วง ยิ่งห่างแกนยิ่งขาดบ่อย
-    for (let y = -wd * 0.55; y < wd * 0.55; y += 1.6) {
-      const edge = Math.abs(y) / (wd * 0.55);
-      let x = len * (0.02 + rnd() * 0.2 * edge);
-      const end = len * (1.02 - edge * (0.25 + rnd() * 0.3));
-      while (x < end) {
-        const seg = 6 + rnd() * (90 * (1 - edge) + 12);
-        ctx.fillRect(x, y, Math.min(seg, end - x), 1.2);
-        x += seg + rnd() * (4 + edge * 30);
-      }
+  function paintSkySplashes(sky, leftColor, rightColor) {
+    const scale = Math.min(W * 0.003, H * 0.002);
+    skySplash(sky, W * 0.045, H * 0.30, scale, -0.42, leftColor);
+    skySplash(sky, W * 0.955, H * 0.10, scale * 0.82, 2.85, rightColor);
+  }
+
+  function skySplash(sky, x, y, scale, angle, color) {
+    sky.save();
+    sky.translate(x, y);
+    sky.rotate(angle);
+    sky.scale(scale, scale);
+    sky.fillStyle = color;
+    sky.globalAlpha = 0.64;
+    sky.beginPath();
+    sky.moveTo(-52, 4);
+    sky.bezierCurveTo(-61, -10, -37, -24, -23, -18);
+    sky.bezierCurveTo(-15, -14, -16, -34, -9, -31);
+    sky.bezierCurveTo(-5, -29, -12, -13, 1, -14);
+    sky.bezierCurveTo(16, -15, 38, -25, 41, -22);
+    sky.bezierCurveTo(45, -18, 19, -10, 23, -6);
+    sky.bezierCurveTo(28, -2, 53, -7, 54, -3);
+    sky.bezierCurveTo(55, 2, 16, 1, 12, 12);
+    sky.bezierCurveTo(7, 28, -2, 16, -14, 20);
+    sky.bezierCurveTo(-32, 27, -46, 20, -52, 4);
+    sky.fill();
+    for (const [dx, dy, r] of [[50, -26, 2.7], [65, -28, 1.5], [68, -4, 3.2], [24, 12, 2], [-16, -40, 2.1]]) {
+      sky.beginPath();
+      sky.ellipse(dx, dy, r * 1.5, r, -0.18, 0, Math.PI * 2);
+      sky.fill();
     }
-    ctx.restore();
+    sky.restore();
   }
 
   function buildWash() {
     wash = offscreen(W, H);
     const w = wash.getContext("2d");
-    const u = Math.min(W, H);
-    brush(w, W * 0.42, H * 0.03, W * 1.08, H * 0.2, u * 0.22, PINK);
-    brush(w, W * 0.7, H * 0.3, W * 1.05, H * 0.24, u * 0.07, PINK);
-    brush(w, -W * 0.06, H * 0.15, W * 0.36, H * 0.3, u * 0.13, MINT);
-    brush(w, W * 0.02, H * 0.42, W * 0.3, H * 0.36, u * 0.05, MINT);
-    // เส้นสปีดสีมินต์
-    w.fillStyle = MINT;
-    for (let i = 0; i < 7; i++) {
-      const y = H * (0.5 + i * 0.012), x0 = W * (0.62 + rnd() * 0.1), l = W * (0.12 + rnd() * 0.2);
-      w.fillRect(x0, y, l, 2);
+    w.save();
+    w.scale(W, H * 0.76);
+    for (const [x, y, tint] of [[0.06, 0.26, "123,218,199"], [0.91, 0.1, "244,170,198"]]) {
+      const glow = w.createRadialGradient(x, y, 0, x, y, 0.78);
+      glow.addColorStop(0, `rgba(${tint},.72)`);
+      glow.addColorStop(0.52, `rgba(${tint},.32)`);
+      glow.addColorStop(1, `rgba(${tint},0)`);
+      w.fillStyle = glow;
+      w.fillRect(0, 0, 1, 1.32);
     }
-    // หยดสีกระเด็น
-    for (let i = 0; i < 14; i++) {
-      w.fillStyle = rnd() < 0.6 ? PINK : MINT;
-      w.beginPath(); w.arc(W * (0.3 + rnd() * 0.7), H * rnd() * 0.45, 1.5 + rnd() * 4, 0, 6.28); w.fill();
-    }
+    w.restore();
+    paintSkySplashes(w, MINT, PINK);
   }
 
-  // ---------- ชั้นหม่น ----------
   function buildGloom() {
     gloom = offscreen(W, H);
     gloomFrame = offscreen(W, H);
     peek = offscreen(W, H);
     const m = gloom.getContext("2d");
     const mg = m.createLinearGradient(0, 0, 0, H);
-    mg.addColorStop(0, "rgb(150,156,178)");
-    mg.addColorStop(0.55, "rgb(134,139,162)");
-    mg.addColorStop(1, "rgb(106,110,134)");
+    mg.addColorStop(0, "rgb(186,189,204)");
+    mg.addColorStop(0.55, "rgb(181,183,198)");
+    mg.addColorStop(1, "rgb(153,157,177)");
     m.fillStyle = mg; m.fillRect(0, 0, W, H);
     const vg = m.createRadialGradient(W / 2, H * 0.42, Math.min(W, H) * 0.22, W / 2, H * 0.42, Math.hypot(W, H) * 0.6);
     vg.addColorStop(0, "rgba(255,255,255,0)");
-    vg.addColorStop(1, "rgba(52,56,76,.6)");
+    vg.addColorStop(1, "rgba(52,56,76,.32)");
     m.fillStyle = vg; m.fillRect(0, 0, W, H);
   }
 
@@ -589,7 +546,6 @@ const City = (() => {
 
     if (li === 0) {
       crane(x, k, W * 0.16, H * 0.43, W * 0.22, 1);
-      crane(x, k, W * 0.93, H * 0.39, W * 0.17, -1);
       tower(x, k);
     }
 
@@ -601,24 +557,9 @@ const City = (() => {
 
       // รายละเอียดในตัวตึก (ตัดตามรูปตึก)
       x.save(); bodyPath(x, b, bx, by); x.clip();
-      if (li === 0) {
-        x.strokeStyle = "rgba(107,102,128,.3)"; x.lineWidth = 1;
-        x.beginPath();
-        for (let vx = bx + b.w * 0.7; vx < r; vx += 3) { x.moveTo(vx, by - b.tip); x.lineTo(vx, H + 4); }
-        x.stroke();
-      } else {
-        // แรเงาเส้นทแยงแบบมังงะที่ขอบขวา
-        const hx = bx + b.w * 0.72;
-        x.strokeStyle = li === 2 ? "rgba(21,18,28,.2)" : "rgba(21,18,28,.15)"; x.lineWidth = 1;
-        x.beginPath();
-        for (let yy = by - b.tip - 40; yy < H + 4; yy += 5) { x.moveTo(hx, yy + (r - hx)); x.lineTo(r, yy); }
-        x.stroke();
-        // เส้นแบ่งชั้น
-        x.strokeStyle = "rgba(55,50,74,.18)";
-        x.beginPath();
-        for (let yy = by + ws.dy * 3; yy < H - 20; yy += ws.dy * 3) { x.moveTo(bx, Math.round(yy) + 0.5); x.lineTo(r, Math.round(yy) + 0.5); }
-        x.stroke();
-      }
+      const shade = b.w * 0.20;
+      x.fillStyle = "rgba(55,50,74,.08)";
+      x.fillRect(r - shade, by - b.tip, shade, b.h + b.tip);
       for (const wn of b.wins) {
         x.fillStyle = wn.on ? WIN_ON[li] : WIN_OFF[li];
         x.fillRect(bx + wn.x, by + wn.y, ws.sx, ws.sy);
@@ -727,34 +668,6 @@ const City = (() => {
     if (r) { r._cachedFillStyle = null; r._cachedStrokeStyle = null; }
   }
 
-  function drawRing(T) {
-    p5Sync();
-    const { rx, ry, rr } = ring;
-    P.push();
-    P.translate(rx, ry); P.rotate(-0.25);
-    c.fillStyle = "rgb(21,18,28)";
-    c.beginPath();
-    for (let i = 0; i < 16; i++) {
-      const a = i / 16 * P.TWO_PI + T * 0.00009;
-      c.rect(Math.cos(a) * rr - 1.5, Math.sin(a) * rr * 0.62 - 1.5, 3, 3);
-    }
-    c.fill();
-    p5Sync();
-    // คลื่นเรดาร์ขยายออกจากวง
-    const k = (T % 5200) / 5200;
-    P.noFill(); P.stroke(21, 18, 28, 110 * (1 - k)); P.strokeWeight(1);
-    P.ellipse(0, 0, rr * 2 * (1 + k * 0.7), rr * 1.24 * (1 + k * 0.7));
-    // ดวงไฟวิ่งรอบวง: เทา → ชมพูเมื่อสีกลับมา
-    const a = T * 0.00055;
-    P.noStroke();
-    P.fill(P.lerpColor(P.color(120, 114, 140), P.color(PINK), sat.now));
-    P.circle(Math.cos(a) * rr, Math.sin(a) * rr * 0.62, 7);
-    P.fill(255, 255, 255, 200);
-    P.circle(Math.cos(a) * rr, Math.sin(a) * rr * 0.62, 3);
-    P.pop();
-  }
-
-  // เมฆรูปร่างไม่เปลี่ยน: วาดครั้งเดียวลง sprite แล้วเลื่อนอย่างเดียว (เดิมวาดวงกลม ~12 วง + clip ต่อเมฆทุกเฟรม)
   function cloudSprite(cl) {
     const maxR = Math.max(...cl.bumps.map(b => b.r)) + 4;
     const ox = maxR, oy = maxR, w = cl.span + maxR * 2, h = maxR + 3;
@@ -765,7 +678,11 @@ const City = (() => {
     s.beginPath();
     for (const b of cl.bumps) { s.moveTo(ox + b.dx + b.r + 1.4, oy); s.arc(ox + b.dx, oy, b.r + 1.4, 0, 6.2832); }
     s.fill();
-    s.fillStyle = "rgb(252,251,254)";
+    const light = s.createLinearGradient(0, 0, 0, oy);
+    light.addColorStop(0, "#fffefa");
+    light.addColorStop(0.66, "#fbf9fc");
+    light.addColorStop(1, "#e2deeb");
+    s.fillStyle = light;
     s.beginPath();
     for (const b of cl.bumps) { s.moveTo(ox + b.dx + b.r, oy); s.arc(ox + b.dx, oy, b.r, 0, 6.2832); }
     s.fill();
@@ -787,7 +704,7 @@ const City = (() => {
   function drawClouds(T) {
     for (const cl of clouds) {
       const span = W + cl.span + 160;
-      const x = ((cl.x + T * cl.v) % span + span) % span - cl.span - 80;
+      const x = (cl.x + cl.span + 80 + T * cl.v) % span - cl.span - 80;
       c.drawImage(cl.sprite, x - cl.ox, cl.y - cl.oy, cl.sw, cl.sh);
     }
   }
@@ -922,10 +839,9 @@ const City = (() => {
     c.setTransform(dpr, 0, 0, dpr, 0, 0);
     c.globalAlpha = 1; c.globalCompositeOperation = "source-over";
     c.drawImage(paper, 0, 0, W, H);
-    drawRing(T);
     if (sat.now > 0.01) {
       c.globalAlpha = sat.now;
-      c.drawImage(wash, 0, (1 - sat.now) * -30, W, H);
+      c.drawImage(wash, 0, 0, W, H);
       c.globalAlpha = 1;
     }
     drawClouds(T);
@@ -1172,7 +1088,13 @@ const City = (() => {
         const tx = ax + (b.x + swayOf(0) + b.w / 2 - ax) * cam.z;
         const ty = H + (H - b.h - b.tip - H) * cam.z;
         const k = (now - cm.t0) / COMET_MS;
-        if (k >= 1) { burst(tx, ty, cm.color, 22); sfx("splash", cm.color); return false; }
+        if (k >= 1) {
+          burst(tx, ty, cm.color, 22);
+          sparkle(tx, ty, cm.color);
+          rings.push({ x: tx, y: ty, color: cm.color, t0: now });
+          sfx("splash", cm.color);
+          return false;
+        }
         const arc = Math.min(170, Math.hypot(tx - cm.x0, ty - cm.y0) * 0.35);
         for (let i = 5; i >= 0; i--) {
           const kk = k - i * 0.045;
@@ -1190,12 +1112,35 @@ const City = (() => {
       });
     }
 
+    // คลื่นกระแทกตอนสีหยดลงยอดตึก: วงสีขยายออก + เส้นหมึกบางตาม
+    if (rings.length) {
+      const now = performance.now();
+      rings = rings.filter(rg => {
+        const k = (now - rg.t0) / RING_MS;
+        if (k >= 1) return false;
+        const e = 1 - Math.pow(1 - k, 3);
+        f.globalAlpha = 1 - k;
+        f.lineWidth = 5 * (1 - k) + 1;
+        f.strokeStyle = rg.color;
+        f.beginPath(); f.arc(rg.x, rg.y, 8 + e * 78, 0, 6.28); f.stroke();
+        f.lineWidth = 1.2; f.strokeStyle = INK;
+        f.beginPath(); f.arc(rg.x, rg.y, 4 + e * 52, 0, 6.28); f.stroke();
+        return true;
+      });
+      f.globalAlpha = 1;
+    }
+
     particles = particles.filter(p => p.life > 0);
     for (const p of particles) {
-      p.vy += 0.04; p.vx *= 0.99; p.x += p.vx; p.y += p.vy; p.life -= 1;
+      p.vy += p.star ? 0.015 : 0.04; p.vx *= p.star ? 0.95 : 0.99; p.x += p.vx; p.y += p.vy; p.life -= 1;
       f.globalAlpha = Math.max(0, p.life / p.max);
       f.fillStyle = p.color;
-      f.fillRect(p.x - p.r, p.y - p.r, p.r * 2, p.r * 2);
+      if (p.star) {
+        // ประกายสี่แฉก: กะพริบขยายแล้วหด
+        const s = p.r * (0.6 + 0.8 * Math.sin(Math.PI * (1 - p.life / p.max)));
+        f.fillRect(p.x - s * 2, p.y - s * 0.3, s * 4, s * 0.6);
+        f.fillRect(p.x - s * 0.3, p.y - s * 2, s * 0.6, s * 4);
+      } else f.fillRect(p.x - p.r, p.y - p.r, p.r * 2, p.r * 2);
     }
     f.globalAlpha = 1;
   }
@@ -1354,6 +1299,20 @@ const City = (() => {
         x, y, vx: Math.cos(a) * s, vy: Math.sin(a) * s - 2,
         r: 1.5 + Math.random() * 3, color: color || PALETTE[i % 5],
         life: 60 + Math.random() * 40, max: 100,
+      });
+    }
+    schedule();
+  }
+
+  // ประกายรอบยอดตึกที่เพิ่งได้สี (สีคำตอบสลับกับสีขาว)
+  function sparkle(x, y, color, n = 9) {
+    if (reduce) return;
+    for (let i = 0; i < n; i++) {
+      const a = (i / n) * 6.28 + Math.random() * 0.5, s = 1.2 + Math.random() * 2.2;
+      particles.push({
+        x: x + Math.cos(a) * 10, y: y + Math.sin(a) * 10, vx: Math.cos(a) * s, vy: Math.sin(a) * s - 1,
+        r: 2.5 + Math.random() * 2.5, color: i % 3 ? color : "#ffffff", star: true,
+        life: 40 + Math.random() * 25, max: 65,
       });
     }
     schedule();

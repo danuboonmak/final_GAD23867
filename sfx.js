@@ -6,6 +6,13 @@ const Sfx = (() => {
   const KEY = "imagineCity.sound";
   let on = true;
   try { on = localStorage.getItem(KEY) !== "off"; } catch (e) {}
+  const volumeKey = "imagineCity.volume";
+  let volume = 100;
+  try {
+    const saved = Number(localStorage.getItem(volumeKey));
+    if (Number.isInteger(saved) && saved >= 1 && saved <= 100) volume = saved;
+  } catch (e) {}
+  const level = () => on ? volume / 100 : 0;
   let ctx = null, master = null, noiseBuf = null;
 
   function wake() {
@@ -13,7 +20,7 @@ const Sfx = (() => {
     if (!ctx) {
       ctx = new AC();
       master = ctx.createGain();
-      master.gain.value = 0.55;
+      master.gain.value = 0.55 * level();
       // กันเสียงซ้อนแล้วแตก
       const comp = ctx.createDynamicsCompressor();
       comp.threshold.value = -14; comp.ratio.value = 6;
@@ -200,7 +207,7 @@ const Sfx = (() => {
       // วนเพลงเองเพื่อกลับไปที่จุดเริ่ม ไม่ใช่ 0:00
       if (start) a.addEventListener("ended", () => { a.currentTime = start; if (on && want === name) a.play().catch(() => {}); });
       a.addEventListener("error", () => {}, { once: true });
-      tracks[name] = { a, raf: 0 };
+      tracks[name] = { a, raf: 0, fadeVolume: 0 };
     }
     return tracks[name];
   }
@@ -213,10 +220,11 @@ const Sfx = (() => {
   // ค่อย ๆ ปรับระดับเสียง (เบราว์เซอร์บางตัวไม่ให้ตั้ง volume เช่น iOS ก็แค่เล่น/หยุดทันที)
   function fade(t, to, ms, then) {
     cancelAnimationFrame(t.raf);
-    const from = t.a.volume, t0 = performance.now();
+    const from = t.fadeVolume, t0 = performance.now();
     const step = now => {
-      const k = Math.min(1, (now - t0) / ms);
-      t.a.volume = Math.max(0, Math.min(1, from + (to - from) * k));
+      const k = Math.max(0, Math.min(1, (now - t0) / ms));
+      t.fadeVolume = from + (to - from) * k;
+      t.a.volume = t.fadeVolume * level();
       if (k < 1) t.raf = requestAnimationFrame(step); else if (then) then();
     };
     t.raf = requestAnimationFrame(step);
@@ -244,6 +252,7 @@ const Sfx = (() => {
   // เปิดหน้ามาเพลงยังเล่นไม่ได้ (ต้องรอแตะก่อน) พอแตะครั้งแรกก็เริ่มเพลงที่ค้างไว้
   const resumeBgm = () => { const t = want && tracks[want]; if (on && t && t.a.paused) syncBgm(false); };
   addEventListener("pointerdown", resumeBgm, { capture: true, passive: true });
+  addEventListener("click", resumeBgm, { capture: true });
   addEventListener("keydown", resumeBgm, { capture: true });
   // สลับแท็บไปที่อื่น: หยุดเพลงไว้ก่อน กลับมาค่อยเล่นต่อ
   document.addEventListener("visibilitychange", () => {
@@ -270,8 +279,39 @@ const Sfx = (() => {
   cross.setAttribute("d", "M16 9.5l5 5M21 9.5l-5 5");
   svg.append(body, waves, cross);
   btn.append(svg);
-  const sync = () => btn.setAttribute("aria-pressed", String(on));
+  const controls = document.createElement("div");
+  controls.className = "sound-controls";
+  const slider = document.createElement("input");
+  slider.type = "range";
+  slider.min = "0";
+  slider.max = "100";
+  slider.setAttribute("aria-label", "ความดังของเสียง");
+  const sync = () => {
+    btn.setAttribute("aria-pressed", String(on));
+    slider.value = String(on ? volume : 0);
+    slider.style.setProperty("--volume", slider.value + "%");
+    slider.setAttribute("aria-valuetext", slider.value + "%");
+    slider.title = "ความดัง " + slider.value + "%";
+    if (master) master.gain.setTargetAtTime(0.55 * level(), ctx.currentTime, 0.01);
+    for (const t of Object.values(tracks)) {
+      t.a.muted = !on;
+      t.a.volume = t.fadeVolume * level();
+    }
+  };
   sync();
+  slider.addEventListener("input", () => {
+    const wasOn = on;
+    const value = slider.valueAsNumber;
+    on = value > 0;
+    if (on) volume = value;
+    try {
+      localStorage.setItem(volumeKey, String(volume));
+      localStorage.setItem(KEY, on ? "on" : "off");
+    } catch (e) {}
+    sync();
+    if (on) wake();
+    if (wasOn !== on) syncBgm(false);
+  });
   btn.addEventListener("click", () => {
     on = !on;
     try { localStorage.setItem(KEY, on ? "on" : "off"); } catch (e) {}
@@ -279,7 +319,8 @@ const Sfx = (() => {
     if (on) { wake(); setTimeout(() => play("chipOn"), 30); }
     syncBgm(false);
   });
-  document.body.append(btn);
+  controls.append(btn, slider);
+  document.body.append(controls);
 
   return { play, bgm, get on() { return on; } };
 })();
