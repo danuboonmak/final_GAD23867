@@ -738,6 +738,18 @@ html.themed .theme-wash::after {
 
 /* การ์ดผลลัพธ์: เงาเหลื่อมแข็งสีตัวละคร ค่อย ๆ โผล่ตามสีที่กระจายมาถึง */
 .card.result { background: var(--panel); overflow: clip; }
+.card.result.share-capture {
+  position: fixed; left: -10000px; top: 0; width: 620px !important; max-width: none;
+  height: auto; zoom: 1 !important; filter: none !important;
+  background: #fff; opacity: 1 !important; transform: none !important;
+}
+.share-capture, .share-capture *, .share-capture *::before, .share-capture *::after {
+  animation: none !important; transition: none !important;
+}
+.share-capture .result-title .burst { opacity: .22; }
+.share-capture .result-title .lead-in { white-space: nowrap; }
+.share-capture .th, .share-capture .ph { display: inline !important; width: auto !important; max-width: none !important; }
+.share-capture .result-major { white-space: nowrap; width: max-content; max-width: 100%; }
 .card.result::before, .card.result::after { content: none; }
 html.themed .card.result { border-color: color-mix(in srgb, var(--theme) 45%, var(--ink)); }
 .btn::before, .career-pills li, .result-title::before, .result-title::after { transition: background-color .8s ease, border-color .8s ease; }

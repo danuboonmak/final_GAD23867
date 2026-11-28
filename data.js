@@ -261,12 +261,16 @@ const FORM_CONSENT = "เมื่อกดยื่นบัตรผ่าน 
 // วางไฟล์ตามพาธด้านล่าง (พื้นหลังโปร่งใส) ถ้ายังไม่มีไฟล์ หน้าเว็บจะแสดงช่องว่างพร้อมป้ายบอกรายละเอียด
 const ART = {
   hero: "assets/hero.webp",                 // หน้าปก: ตัวละครหลักกับเมือง 1080×1350
+  shareCharacter: {
+    DGA: "assets/DGA.PNG", DGD: "assets/DGD.PNG", IGD: "assets/IGD.PNG",
+    AFX: "assets/AFX.PNG", DEN: "assets/DEN.PNG",
+  },
   result: {                                  // หน้าผลลัพธ์: มาสคอตประจำแต่ละสาขา แนวนอน 1600×1131 (ต้นฉบับ A4 อยู่ที่ assets/FINAL2-0x.png)
-    DGA: "assets/result-dga.webp",
-    DGD: "assets/result-dgd.webp",
-    IGD: "assets/result-igd.webp",
-    AFX: "assets/result-afx.webp",
-    DEN: "assets/result-den.webp",
+    DGA: "assets/DGA.PNG",
+    DGD: "assets/DGD.PNG",
+    IGD: "assets/IGD.PNG",
+    AFX: "assets/AFX.PNG",
+    DEN: "assets/DEN.PNG",
   },
   resultAnimated: {
     DGA: "assets/result-dga-animated.webp",

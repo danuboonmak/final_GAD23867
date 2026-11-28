@@ -678,108 +678,67 @@ function saveRecord() {
   });
 }
 
-// ---------- ภาพผลลัพธ์สำหรับแชร์ (แนวตั้ง 4:5 ลงสตอรี่/ฟีดได้) ----------
-// วาดด้วย canvas จากของจริงบนหน้า: กระดาษ ปาดสีชมพู/มินต์ มาสคอต ชื่อผลลัพธ์ และสาขา
-const segmentTH = text => (window.Intl && Intl.Segmenter)
-  ? [...new Intl.Segmenter("th", { granularity: "word" }).segment(text)].map(s => s.segment)
-  : [...text];
-function wrapCanvas(ctx, text, maxW) {
-  const lines = [""];
-  // ตัดตรงช่องว่างระหว่างวลีก่อน ถ้าวลีเดียวยาวเกินบรรทัดค่อยแยกเป็นคำ (รวม NBSP/"ๆ" เข้ากับคำข้างหน้า)
-  const words = glueTH(text).split(/(?<= )/).flatMap(ph => ctx.measureText(ph.trim()).width <= maxW ? [ph] : segmentTH(ph).reduce((a, s) => {
-    if (a.length && /^[ ๆ]/.test(s)) a[a.length - 1] += s; else a.push(s);
-    return a;
-  }, []));
-  for (const w of words) {
-    const t = lines[lines.length - 1] + w;
-    if (ctx.measureText(t).width > maxW && lines[lines.length - 1].trim()) lines.push(w.trimStart());
-    else lines[lines.length - 1] = t;
+// Capture the actual result card, excluding controls, as the share image.
+async function shareImage(card) {
+  await document.fonts.ready;
+  const copy = card.cloneNode(true);
+  copy.classList.add("share-capture");
+  const closing = copy.querySelector(".closing");
+  while (closing && closing.nextElementSibling) closing.nextElementSibling.remove();
+  document.body.append(copy);
+  try {
+    await Promise.all([...copy.querySelectorAll("img")].map(img => img.decode()));
+    const blob = await htmlToImage.toBlob(copy, {
+      pixelRatio: 2, backgroundColor: "#ffffff",
+      style: { position: "static", left: "0", top: "0", transform: "none" },
+    });
+    if (!blob) throw new Error("Image export failed");
+    return blob;
+  } finally {
+    copy.remove();
   }
-  return lines;
-}
-async function shareImage(codes, title, leadIn) {
-  const W = 1080, H = 1350, INK = "#15121c", PAPER = "#f4f2f7";
-  await Promise.all(['italic 700 90px "Chakra Petch"', '600 36px "Chakra Petch"', '500 34px "Bai Jamjuree"']
-    .map(f => document.fonts.load(f).catch(() => {})));
-  const c = document.createElement("canvas");
-  c.width = W; c.height = H;
-  const x = c.getContext("2d");
-  x.fillStyle = PAPER; x.fillRect(0, 0, W, H);
-  const slash = (y, h, col) => { x.fillStyle = col; x.beginPath(); x.moveTo(0, y + 120); x.lineTo(W, y); x.lineTo(W, y + h); x.lineTo(0, y + h + 120); x.fill(); };
-  // ปาดสีตามธีมของตัวละคร ให้ภาพแชร์ตรงกับหน้าผลลัพธ์
-  slash(430, 120, CHAR_COLOR[codes[0]]); slash(560, 70, CHAR_COLOR[codes[codes.length - 1]]);
-  slash(660, 40, INK);
-  // มาสคอต
-  for (const [i, code] of codes.entries()) {
-    const img = new Image();
-    img.src = ART.result[code];
-    try { await img.decode(); } catch { continue; }
-    const slot = 1000 / codes.length;
-    const iw = codes.length === 1 ? slot : slot - 24;
-    const ih = iw * img.naturalHeight / img.naturalWidth;
-    x.drawImage(img, (W - 1000) / 2 + i * slot + (slot - iw) / 2, codes.length === 1 ? 330 : 680 - ih / 2, iw, ih);
-  }
-  // มุมกรอบ HUD
-  x.strokeStyle = INK; x.lineWidth = 8;
-  x.beginPath(); x.moveTo(48, 110); x.lineTo(48, 48); x.lineTo(110, 48); x.stroke();
-  x.beginPath(); x.moveTo(W - 48, H - 110); x.lineTo(W - 48, H - 48); x.lineTo(W - 110, H - 48); x.stroke();
-  // หัว: ชื่อโปรเจกต์ + ประโยคนำ + ชื่อผลลัพธ์ (ย่อให้พอดีบรรทัดเดียวก่อน ถ้าไม่พอค่อยตัดสองบรรทัด)
-  x.fillStyle = INK; x.textBaseline = "alphabetic";
-  x.font = '600 34px "Chakra Petch"'; x.fillText("IMAGINE CITY", 96, 132);
-  x.font = '500 38px "Bai Jamjuree"'; x.fillStyle = "#4d4859"; x.fillText(leadIn, 96, 196);
-  x.fillStyle = INK;
-  let size = 96, lines;
-  do { x.font = `italic 700 ${size}px "Chakra Petch"`; lines = [title]; size -= 4; } while (x.measureText(title).width > W - 192 && size >= 64);
-  if (x.measureText(title).width > W - 192) { x.font = 'italic 700 76px "Chakra Petch"'; lines = wrapCanvas(x, title, W - 192); size = 72; }
-  // เงาหัวข้อเป็นสีหลักของตัวละคร ให้ตรงกับหน้าเว็บ
-  lines.slice(0, 2).forEach((l, k) => {
-    x.fillStyle = CHAR_COLOR[codes[0]]; x.fillText(l, 102, 296 + k * (size + 18));
-    x.fillStyle = INK; x.fillText(l, 96, 290 + k * (size + 18));
-  });
-  // ป้ายสาขา
-  let y = 1090;
-  x.font = '600 36px "Chakra Petch"';
-  for (const code of codes) {
-    const label = `สาขา ${MAJORS[code].name}`;
-    const w = Math.min(W - 192, x.measureText(label).width + 48);
-    x.fillStyle = CHAR_COLOR[code]; x.fillRect(96, y, w, 70);
-    x.strokeStyle = INK; x.lineWidth = 4; x.strokeRect(96, y, w, 70);
-    x.fillStyle = INK; x.fillText(label, 120, y + 48, w - 48);
-    y += 88;
-  }
-  x.font = '500 30px "Bai Jamjuree"'; x.fillStyle = "#4d4859";
-  x.fillText("คืนสุดท้ายก่อนสีจะหายไป", 96, H - 80);
-  return new Promise(res => c.toBlob(res, "image/png"));
 }
 
-function shareBlock(codes, title, leadIn) {
+function shareBlock(codes, title) {
   const status = el("p", { class: "toast", role: "status" });
   const btn = el("button", { type: "button", class: "btn" }, "แชร์ผลลัพธ์");
-  btn.addEventListener("click", async () => {
+  const filename = `imagine-city-${codes.join("-").toLowerCase()}.png`;
+  let blob = null, file = null, downloadUrl = null;
+  let resultCardElement = null;
+  const prepare = async (card) => {
+    if (card) resultCardElement = card;
     btn.disabled = true;
-    const label = btn.textContent;
     btn.textContent = "กำลังทำภาพ…";
-    status.textContent = "";
     try {
-      const blob = await shareImage(codes, title, leadIn);
-      const file = new File([blob], `imagine-city-${codes.join("-").toLowerCase()}.png`, { type: "image/png" });
-      if (navigator.canShare && navigator.canShare({ files: [file] })) {
-        try { await navigator.share({ files: [file], title: "Imagine City", text: `ฉันคือ "${title}" ใน Imagine City` }); }
-        catch (e) { if (e.name !== "AbortError") throw e; }
-      } else {
-        const a = el("a", { href: URL.createObjectURL(blob), download: file.name });
-        document.body.append(a); a.click(); a.remove();
-        setTimeout(() => URL.revokeObjectURL(a.href), 4000);
-        status.textContent = "บันทึกภาพผลลัพธ์แล้ว เอาไปลงสตอรี่ได้เลย";
-        sfx("success");
-      }
+      blob = await shareImage(resultCardElement);
+      file = typeof File === "function" ? new File([blob], filename, { type: "image/png" }) : null;
+      status.textContent = "";
+      btn.textContent = "แชร์ผลลัพธ์";
     } catch (e) {
-      status.textContent = "ทำภาพไม่สำเร็จ ลองอีกครั้ง หรือแคปหน้าจอส่วนบนไปแชร์แทนก็ได้";
+      blob = null;
+      btn.textContent = "ลองสร้างภาพอีกครั้ง";
+      status.textContent = "สร้างภาพไม่สำเร็จ กรุณาลองอีกครั้ง";
     }
     btn.disabled = false;
-    btn.textContent = label;
+  };
+  const download = () => {
+    if (!downloadUrl) downloadUrl = URL.createObjectURL(blob);
+    const link = el("a", { href: downloadUrl, download: filename }, "บันทึกภาพผลลัพธ์");
+    status.replaceChildren("อุปกรณ์นี้อาจไม่รองรับการแชร์ไฟล์โดยตรง ", link);
+    link.click();
+  };
+  btn.addEventListener("click", () => {
+    if (!blob) { prepare(); return; }
+    let canShare = false;
+    try { canShare = !!(file && navigator.share && navigator.canShare && navigator.canShare({ files: [file] })); } catch {}
+    if (!canShare) { download(); return; }
+    // Call share directly in the click handler so mobile browsers retain user activation.
+    try {
+      navigator.share({ files: [file], title: "Imagine City", text: `ฉันคือ "${title}" ใน Imagine City` })
+        .catch(e => { if (e.name !== "AbortError") download(); });
+    } catch (e) { if (e.name !== "AbortError") download(); }
   });
-  return { btn, status };
+  return { btn, status, prepare };
 }
 
 // ชื่อผลลัพธ์: ย่อให้อยู่บรรทัดเดียวก่อน (ไม่ตัดกลางคำ) ถ้าเล็กสุดแล้วยังไม่พอ ค่อยยอมให้ตัดบรรทัด
@@ -887,7 +846,7 @@ function resultCard(codes) {
 
   // ให้ช่องทางติดต่อไว้แล้วในบัตรผ่าน: ไม่ต้องขอซ้ำ บอกแค่ว่าข่าวจะไปทางไหน
   const sub = state.subscribed ? null : subscribeBlock();
-  const share = shareBlock(codes, title, leadIn);
+  const share = shareBlock(codes, title);
   const name = el("span", { class: "name" }, title);
   const mascots = codes.map(code => artSlot(reduceMotion() ? ART.result[code] : ART.resultAnimated[code], RESULTS[code].title, "1600×1131",
     codes.length === 1 ? "result-art" : "result-mascot", ART.result[code]));
@@ -921,6 +880,7 @@ function resultCard(codes) {
   [...card.children].slice(2).forEach((c, i) => c.style && c.style.setProperty("--d", (1.05 + i * 0.12).toFixed(2)));
   card.querySelectorAll(".career-pills li").forEach((li, i) => li.style.setProperty("--i", i));
   show(card);
+  share.prepare(card);
   resultSounds(card, codes);
   // พื้นหลังเปลี่ยนเป็นสีตัวละครหลังการ์ดเผยผลครบ (ป้ายสาขาประทับเสร็จ) ไม่แย่งจังหวะบอกผล
   const mb = card.querySelector(".result-major");
