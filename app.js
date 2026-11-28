@@ -750,55 +750,6 @@ function fitLine(n, min = 22) {
   if (n.scrollWidth > n.clientWidth) n.style.whiteSpace = "";
 }
 
-// รับข่าวสาร: ถ้ายังไม่มีช่องทางติดต่อ ขอในการ์ดเลย (ไม่ใช้ modal)
-function subscribeBlock() {
-  const status = el("p", { class: "toast", role: "status" });
-  const panelId = uid("subscribe");
-  const openBtn = el("button", { type: "button", class: "btn ghost", "aria-expanded": "false", "aria-controls": panelId }, "รับข่าวกิจกรรมและทุน");
-  const panel = el("div", { class: "subscribe-panel", id: panelId, hidden: true });
-  const data = state.form;
-  let handle, chErr;
-
-  const done = res => {
-    sfx("success");
-    panel.hidden = true;
-    openBtn.disabled = true;
-    openBtn.textContent = "รับข่าวสารแล้ว";
-    openBtn.setAttribute("aria-expanded", "false");
-    status.textContent = res === "queued"
-      ? "ตอนนี้ยังส่งไม่ออก เพราะอินเทอร์เน็ตขัดข้อง เราเก็บไว้ให้แล้ว และจะส่งให้เองเมื่อกลับมาออนไลน์"
-      : `เรียบร้อย! SDM จะส่งข่าวกิจกรรมและทุนให้เธอทาง ${data.contact} ก่อนใคร`;
-  };
-  const send = async btn => {
-    btn.disabled = true;
-    btn.textContent = "กำลังส่ง…";
-    state.subscribed = true;
-    done(await saveRecord());
-  };
-
-  openBtn.addEventListener("click", () => {
-    if (data.contact && data.contactHandle && contactHandle(data).validate(true)) return send(openBtn);
-    if (!panel.hidden) return;
-    handle = contactHandle(data);
-    chErr = el("p", { class: "field-error", hidden: true });
-    const { qid, chips } = chipGroup(CONTACT_FIELD, data, () => { chErr.hidden = true; handle.render(); });
-    const sendBtn = el("button", { type: "button", class: "btn" }, "ส่งให้ SDM");
-    sendBtn.addEventListener("click", () => {
-      if (!data.contact) { chErr.replaceChildren(warn(), el("span", {}, "เลือกก่อนว่าจะให้ส่งข่าวไปทางไหน")); chErr.hidden = false; sfx("error"); chips.querySelector(".chip").focus(); return; }
-      if (!handle.validate(true)) return;
-      send(sendBtn);
-    });
-    panel.replaceChildren(
-      el("div", { class: "field" }, el("span", { class: "q", id: qid }, "ให้ SDM ส่งข่าวไปทางไหนดี"), chips, chErr, handle.slot),
-      el("div", { class: "actions" }, sendBtn));
-    panel.hidden = false;
-    openBtn.setAttribute("aria-expanded", "true");
-    chips.querySelector(".chip").focus();
-  });
-
-  return { openBtn, panel, status };
-}
-
 // กรอกฟอร์มเสร็จแล้วไปการ์ดผลลัพธ์ทันที (การ์ดจุดพลุสีทั่วเมืองเอง)
 function result() {
   City.setProgress(1);
@@ -844,8 +795,6 @@ function resultCard(codes) {
     : RESULTS[codes[0]].title;
   const leadIn = codes.length === 2 ? "เธอเป็นสองแบบพอ ๆ กัน" : "เธอคือนักเดินทางแบบ";
 
-  // ให้ช่องทางติดต่อไว้แล้วในบัตรผ่าน: ไม่ต้องขอซ้ำ บอกแค่ว่าข่าวจะไปทางไหน
-  const sub = state.subscribed ? null : subscribeBlock();
   const share = shareBlock(codes, title);
   const name = el("span", { class: "name" }, title);
   const mascots = codes.map(code => artSlot(reduceMotion() ? ART.result[code] : ART.resultAnimated[code], RESULTS[code].title, "1600×1131",
@@ -871,10 +820,9 @@ function resultCard(codes) {
     el("p", { class: "closing" }, "ไม่ว่าเธอจะเป็นนักเดินทางแบบไหน เมืองนี้ยังมีที่ว่างรออยู่"),
     el("div", { class: "actions" },
       share.btn,
-      sub && sub.openBtn,
+      el("a", { class: "btn ghost follow-news", href: "https://www.facebook.com/sdmspu", target: "_blank", rel: "noopener noreferrer" }, "ติดตามข่าวสาร"),
       el("button", { type: "button", class: "link-btn", onclick: () => { reset(); next(); } }, "เล่นอีกครั้ง")),
-    share.status,
-    sub ? [sub.panel, sub.status] : el("p", { class: "toast" }, `SDM จะส่งข่าวกิจกรรมและทุนให้เธอทาง ${state.form.contact} ก่อนใคร`));
+    share.status);
 
   // ลำดับการโผล่: ชื่อกระแทก > ภาพตัวละคร > บล็อกที่เหลือทยอยตามกัน (CSS อ่าน --d เป็นวินาที)
   [...card.children].slice(2).forEach((c, i) => c.style && c.style.setProperty("--d", (1.05 + i * 0.12).toFixed(2)));

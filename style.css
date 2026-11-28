@@ -341,6 +341,7 @@ body:has(.cover) #city, .cover > .art, .cover-story { filter: saturate(.08); }
 .btn.ghost::after { inset: 2px; background: var(--panel); --hex: polygon(11px 0, calc(100% - 11px) 0, 100% 50%, calc(100% - 11px) 100%, 11px 100%, 0 50%); }
 .btn.ghost .chev { width: 14px; height: 11px; }
 .btn.ghost:active:not(:disabled) { transform: translateY(1px); filter: none; }
+.follow-news { text-decoration: none; }
 .actions { display: flex; align-items: center; gap: 14px 18px; flex-wrap: wrap; margin-top: 24px; }
 /* ปุ่มหลักบนปกและหน้าเผยสี: ขนาบด้วยลูกศรสามเหลี่ยมคู่ */
 .cover-foot .actions { align-items: center; flex-wrap: nowrap; }
