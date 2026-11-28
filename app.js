@@ -133,9 +133,30 @@ const el = (tag, attrs = {}, ...kids) => {
     else if (k.startsWith("on")) n.addEventListener(k.slice(2), v);
     else n.setAttribute(k, v === true ? "" : v);
   }
-  for (const k of kids.flat()) if (k != null && k !== false) n.append(k);
+  for (const k of kids.flat()) if (k != null && k !== false) n.append(typeof k === "string" ? phraseTH(k) : k);
   return n;
 };
+// ภาษาไทยเว้นวรรคระหว่างวลี แต่เบราว์เซอร์ตัดบรรทัดตรงไหนก็ได้ที่เป็นรอยต่อคำ จึงมีคำหลุดไปค้างท้ายบรรทัด
+// ห่อแต่ละวลีเป็น inline-block ให้ตัดบรรทัดได้แค่ตรงช่องว่าง (วลีที่ยาวเกินบรรทัดยังตัดข้างในได้ ไม่ล้นจอ)
+// ห่อทั้งหมดไว้ใน span เดียว เพื่อไม่ให้ flex/grid ที่ครอบอยู่เห็นเป็นหลายชิ้น
+function phraseTH(s) {
+  s = glueTH(s);
+  if (!/[฀-๿]/.test(s) || !s.trim().includes(" ")) return s;
+  const wrap = document.createElement("span");
+  wrap.className = "th";
+  for (const part of s.split(/( +)/)) {
+    if (!part) continue;
+    if (part.trim() === "") { wrap.append(part); continue; }
+    const p = document.createElement("span");
+    p.className = "ph";
+    p.textContent = part;
+    wrap.append(p);
+  }
+  return wrap;
+}
+// ช่องว่างหน้า "ๆ" เป็นจุดที่เบราว์เซอร์ตัดบรรทัดได้ ทำให้ "ๆ" ไปโผล่ต้นบรรทัดใหม่
+// เปลี่ยนเป็นช่องว่างไม่ตัดบรรทัด (NBSP) เฉพาะข้อความที่แสดงผล ค่าที่ใช้เทียบ (เช่น OTHER) ไม่ถูกแตะ
+function glueTH(s) { return s.replace(/ ๆ/g, " ๆ"); }
 const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
 
 // ลูกศรคู่ วาดด้วย SVG
@@ -169,21 +190,37 @@ const warn = () => icon("warn", "M9 1.5l7.5 13h-15zM9 6.5v3.6M9 11.6v1.2", "0 0 
 const DEV = new URLSearchParams(location.search).has("dev");
 
 // ช่องภาพประกอบจากทีมวาด: ถ้ายังไม่มีไฟล์ ช่องจะหายไปให้เมืองลายเส้นเต็มพื้นที่แทน
-function artSlot(src, what, size, cls = "") {
+function artSlot(src, what, size, cls = "", fallback = null) {
   const box = el("figure", { class: "art " + cls });
   const img = el("img", { src, alt: "" });
-  img.addEventListener("error", () => box.classList.add("absent"));
+  img.addEventListener("error", () => {
+    if (fallback) { img.src = fallback; fallback = null; }
+    else box.classList.add("absent");
+  });
   box.append(img);
   return box;
 }
 
 // ---------- ไกด์ ----------
 // ไกด์ลอยไปข้างการ์ดตรงกับสิ่งที่เธอชี้หรือโฟกัสอยู่ (ตัวเลือก ชิป ปุ่ม)
-const ATTEND = ".option, .chip, .btn, .card input, .card select, .card textarea";
+const ATTEND = "button, .card input, .card select, .card textarea";
 const attendable = n => n instanceof Element && !n.closest(".options.locked") ? n.closest(ATTEND) : null;
-stage.addEventListener("pointerover", e => { const n = attendable(e.target); if (n) City.attend(n); });
-stage.addEventListener("pointerout", e => { if (attendable(e.target) && !attendable(e.relatedTarget)) City.attend(null); });
-stage.addEventListener("focusin", e => { const n = attendable(e.target); City.attend(n || null); });
+let hoverExitTimer;
+document.addEventListener("pointerover", e => {
+  const n = attendable(e.target);
+  if (!n) return;
+  clearTimeout(hoverExitTimer);
+  City.attend(n);
+});
+document.addEventListener("pointerout", e => {
+  if (!attendable(e.target) || attendable(e.relatedTarget)) return;
+  clearTimeout(hoverExitTimer);
+  hoverExitTimer = setTimeout(() => City.attend(null), 180);
+});
+stage.addEventListener("focusin", e => {
+  clearTimeout(hoverExitTimer);
+  City.attend(attendable(e.target));
+});
 const pickLine = a => a[Math.floor(Math.random() * a.length)];
 // ---------- เสียงประกอบ (sfx.js) ----------
 const sfx = (name, arg) => { if (typeof Sfx !== "undefined") Sfx.play(name, arg); };
@@ -208,15 +245,37 @@ let idleT = 0;
 const idleHint = (ms = 14000) => { idleT = setTimeout(() => City.say(pickLine(IDLE), 3600), ms); };
 
 let busy = false; // กันกดซ้ำระหว่างเปลี่ยนฉาก (ไม่งั้นฉากถัดไปจะถูกข้าม)
+function fitStageCard() {
+  const card = stage.firstElementChild;
+  if (!card?.classList.contains("card")) return;
+  const style = getComputedStyle(stage);
+  const width = stage.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight);
+  card.style.width = Math.min(width, 620) + "px";
+  // Result cards can be taller than the viewport. Keep their size stable and let the page scroll.
+  if (card.classList.contains("result")) {
+    card.style.zoom = "";
+    return;
+  }
+  const height = document.documentElement.clientHeight - parseFloat(style.paddingTop) - parseFloat(style.paddingBottom);
+  card.style.zoom = Math.min(1, Math.max(1, height - 2) / Math.max(1, card.offsetHeight));
+}
+const cardSizeObserver = window.ResizeObserver && new ResizeObserver(fitStageCard);
+cardSizeObserver?.observe(hud);
+window.addEventListener("resize", fitStageCard);
+
 function show(card) {
   busy = true;
   clearTimeout(idleT);
   sfxT.forEach(clearTimeout); sfxT = [];
+  clearTimeout(hoverExitTimer);
   City.attend(null);
   const old = stage.firstElementChild;
   const put = () => {
     busy = false;
+    if (stage.firstElementChild) cardSizeObserver?.unobserve(stage.firstElementChild);
     stage.replaceChildren(card);
+    fitStageCard();
+    cardSizeObserver?.observe(card);
     (document.scrollingElement || document.documentElement).scrollTop = 0;
     // โฟกัสที่หัวเรื่อง: โปรแกรมอ่านหน้าจออ่านเรื่องและคำถามก่อน แล้วค่อยถึงตัวเลือก
     const f = card.querySelector("[data-focus]") || card.querySelector("h1, h2");
@@ -269,32 +328,23 @@ function chapterSplash(n, then) {
 
 // ---------- screens ----------
 function intro() {
+  const story = el("dialog", { class: "cover-story", "aria-label": "เรื่องราว Imagine City" },
+    el("p", { class: "tagline" }, "คืนนี้สีสันของ Imagine City กำลังจะหายไปทั้งเมือง และมีเธอเป็นคนเดียวที่ช่วยได้"),
+    el("p", {}, "ทุกอย่างซีดเป็นสีเทา เหลือเวลาอีกแค่คืนเดียว ถ้ามีใครขึ้นเวทีในเทศกาล Imagine Design Event แล้วทำให้คนทั้งเมืองกลับมายิ้มได้ สีทั้งหมดก็จะกลับมา"),
+    el("button", { type: "button", class: "chip", onclick: () => story.close() }, "ปิด"));
   show(el("section", { class: "cover" },
-    // ลำดับอ่าน: หัวปก > กล่องเรื่อง (คำโปรยหนา + เรื่องย่อ) > ปุ่ม > บอกว่าจะเจออะไร
-    el("div", { class: "cover-head" },
-      el("span", { class: "splash", "aria-hidden": "true" }),
-      el("span", { class: "corner tl", "aria-hidden": "true" }),
-      el("span", { class: "corner br", "aria-hidden": "true" }),
-      el("h1", {}, el("span", { class: "ln" }, "คืนสุดท้าย"), el("span", { class: "ln" }, "ก่อนสีจะหายไป")),
-      el("p", { class: "kicker" }, el("span", {}, "IMAGINE CITY ·"), el("span", {}, "STORY QUIZ"))),
+    el("h1", { class: "cover-head" },
+      el("img", { class: "cover-splash cover-splash-pink", src: "assets/Splash 1.svg", alt: "", "aria-hidden": "true" }),
+      el("img", { class: "cover-splash cover-splash-mint", src: "assets/Splash 2.svg", alt: "", "aria-hidden": "true" }),
+      el("img", { class: "cover-frame", src: "assets/Frame.svg", alt: "", "aria-hidden": "true" }),
+      el("img", { class: "cover-logo", src: "assets/Logo-full.svg", alt: "คืนสุดท้าย ก่อนสีจะหายไป" })),
     artSlot(ART.hero, "ตัวละครหลักกับเมือง Imagine City (พื้นหลังโปร่งใส)", "1080×1350"),
     el("div", { class: "cover-foot" },
-      el("div", { class: "cover-story" },
-        el("p", { class: "tagline" }, "คืนนี้สีสันของ Imagine City กำลังจะหายไปทั้งเมือง และมีเธอเป็นคนเดียวที่ช่วยได้"),
-        el("p", {}, "ทุกอย่างซีดเป็นสีเทา เหลือเวลาอีกแค่คืนเดียว ถ้ามีใครขึ้นเวทีในเทศกาล Imagine Design Event แล้วทำให้คนทั้งเมืองกลับมายิ้มได้ สีทั้งหมดก็จะกลับมา")),
-      el("div", { class: "actions" }, el("button", { type: "button", class: "btn", onclick: next }, "ลืมตาตื่น", chev())))));
+      story,
+      el("div", { class: "actions" },
+        el("button", { type: "button", class: "btn", onclick: next }, "ลืมตาตื่น", chev()))),
+    el("button", { type: "button", class: "story-trigger", "aria-haspopup": "dialog", onclick: () => story.showModal() }, "เรื่องราว")));
   idleT = setTimeout(() => City.say("สวัสดี! ลองแตะฉันดูสิ", 3200), 1800);
-}
-
-// หัวบท: ชื่อบท + เรื่องย่อ วางบนฉากแรกของบท แทนการ์ดบทที่ต้องกด "ไปต่อ"
-function chapterHead(n, codes) {
-  if (!n) return null;
-  const ch = CHAPTERS[n];
-  // หัวบทเป็นบริบทรอง: ป้ายบทตัวหมึก + เรื่องย่อเล็ก จาง ให้คำถามของฉากเป็นพระเอก
-  const [, tag, name] = ch.title.match(/^(บทที่ \d+)\s*(.*)$/) || [, "", ch.title];
-  return el("div", { class: "chapter-head", "data-focus": "" },
-    el("b", {}, tag && el("span", { class: "ch-tag" }, tag), el("span", {}, name)),
-    el("p", {}, ch.text));
 }
 
 // ---------- หลังเลือกคำตอบ ----------
@@ -315,7 +365,7 @@ function paintThen(color, from) {
     City.focus(0.5, 1);
     const go = () => (busy ? setTimeout(go, 50) : next());
     go();
-  }, reduceMotion() ? 300 : 950);
+  }, reduceMotion() ? 300 : 1600);
 }
 
 // ชิปสีบินโค้งจากคำตอบไปลงช่องของตัวนับ แล้วช่องนั้นค่อยเด้งรับสี (ไม่บังอะไร ไม่ต้องรอ)
@@ -355,7 +405,8 @@ function choiceList(options, onPick, colorOf, labelId, onDone) {
       if (box.classList.contains("locked")) return;
       box.classList.add("locked");
       clearTimeout(idleT);
-      City.attend(null);
+      clearTimeout(hoverExitTimer);
+      City.attend(b, true);
       box.querySelectorAll(".option").forEach(o => o !== b && o.setAttribute("aria-disabled", "true"));
       const color = colorOf(opt);
       b.style.setProperty("--pick", color);
@@ -387,7 +438,6 @@ function scene({ id, ch }) {
   const s = SCENES[id];
   const pid = uid("prompt");
   show(el("section", { class: ch ? "card chapter" : "card" },
-    chapterHead(ch),
     el("h2", {}, s.title.replace(/^ฉาก [\d.]+ /, "")),
     el("p", { id: pid, class: "prompt" }, s.prompt),
     choiceList(s.options, ([, code]) => {
@@ -399,11 +449,10 @@ function scene({ id, ch }) {
   idleHint();
 }
 
-function district({ code, ch, codes }) {
+function district({ code, ch }) {
   const d = DISTRICTS[code];
   const pid = uid("prompt");
   show(el("section", { class: ch ? "card chapter" : "card" },
-    chapterHead(ch, codes),
     el("h2", {}, d.title),
     el("p", { id: pid, class: "prompt" }, d.prompt),
     choiceList(d.options, ([, career]) => { state.districtPicks[code] = career; }, () => MAJORS[code].color, pid,
@@ -636,7 +685,12 @@ const segmentTH = text => (window.Intl && Intl.Segmenter)
   : [...text];
 function wrapCanvas(ctx, text, maxW) {
   const lines = [""];
-  for (const w of segmentTH(text)) {
+  // ตัดตรงช่องว่างระหว่างวลีก่อน ถ้าวลีเดียวยาวเกินบรรทัดค่อยแยกเป็นคำ (รวม NBSP/"ๆ" เข้ากับคำข้างหน้า)
+  const words = glueTH(text).split(/(?<= )/).flatMap(ph => ctx.measureText(ph.trim()).width <= maxW ? [ph] : segmentTH(ph).reduce((a, s) => {
+    if (a.length && /^[ ๆ]/.test(s)) a[a.length - 1] += s; else a.push(s);
+    return a;
+  }, []));
+  for (const w of words) {
     const t = lines[lines.length - 1] + w;
     if (ctx.measureText(t).width > maxW && lines[lines.length - 1].trim()) lines.push(w.trimStart());
     else lines[lines.length - 1] = t;
@@ -656,13 +710,15 @@ async function shareImage(codes, title, leadIn) {
   slash(430, 120, CHAR_COLOR[codes[0]]); slash(560, 70, CHAR_COLOR[codes[codes.length - 1]]);
   slash(660, 40, INK);
   // มาสคอต
-  try {
+  for (const [i, code] of codes.entries()) {
     const img = new Image();
-    img.src = ART.result[codes[0]];
-    await img.decode();
-    const iw = 1000, ih = iw * img.naturalHeight / img.naturalWidth;
-    x.drawImage(img, (W - iw) / 2, 330, iw, ih);
-  } catch (e) { /* ไม่มีภาพ ก็ยังได้การ์ดตัวหนังสือ */ }
+    img.src = ART.result[code];
+    try { await img.decode(); } catch { continue; }
+    const slot = 1000 / codes.length;
+    const iw = codes.length === 1 ? slot : slot - 24;
+    const ih = iw * img.naturalHeight / img.naturalWidth;
+    x.drawImage(img, (W - 1000) / 2 + i * slot + (slot - iw) / 2, codes.length === 1 ? 330 : 680 - ih / 2, iw, ih);
+  }
   // มุมกรอบ HUD
   x.strokeStyle = INK; x.lineWidth = 8;
   x.beginPath(); x.moveTo(48, 110); x.lineTo(48, 48); x.lineTo(110, 48); x.stroke();
@@ -833,7 +889,9 @@ function resultCard(codes) {
   const sub = state.subscribed ? null : subscribeBlock();
   const share = shareBlock(codes, title, leadIn);
   const name = el("span", { class: "name" }, title);
-  const art = artSlot(ART.result[codes[0]], `ตัวละครของผลลัพธ์ "${RESULTS[codes[0]].title}" (พื้นหลังโปร่งใส)`, "1600×1131", "result-art");
+  const mascots = codes.map(code => artSlot(reduceMotion() ? ART.result[code] : ART.resultAnimated[code], RESULTS[code].title, "1600×1131",
+    codes.length === 1 ? "result-art" : "result-mascot", ART.result[code]));
+  const art = codes.length === 1 ? mascots[0] : el("div", { class: "result-art result-pair" }, mascots);
 
   const card = el("section", { class: "card result", style: `--c:${CHAR_COLOR[codes[0]]};--c2:${CHAR_COLOR[codes[codes.length - 1]]};--char:${CHAR_COLOR[codes[0]]}` },
     el("h1", { class: "result-title" }, el("span", { class: "burst", "aria-hidden": "true" }), el("span", { class: "lead-in" }, leadIn), name),
@@ -879,6 +937,7 @@ function resultCard(codes) {
 function devJump(codes) {
   if (busy) return;
   reset();
+  City.follow(false);
   state.queue = [];
   for (const c of codes) {
     const opts = DISTRICTS[c].options;

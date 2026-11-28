@@ -268,4 +268,11 @@ const ART = {
     AFX: "assets/result-afx.webp",
     DEN: "assets/result-den.webp",
   },
+  resultAnimated: {
+    DGA: "assets/result-dga-animated.webp",
+    DGD: "assets/result-dgd-animated.webp",
+    IGD: "assets/result-igd-animated.webp",
+    AFX: "assets/result-afx-animated.webp",
+    DEN: "assets/result-den-animated.webp",
+  },
 };

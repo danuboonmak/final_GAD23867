@@ -64,9 +64,15 @@ const City = (() => {
   // โหมดตามเมาส์ (หน้าแรก): สปริงไล่ตามเคอร์เซอร์
   let following = false;
   const mouse = { x: 0, y: 0, on: false };
+  let guideFacing = 1;
+  let blinkAt = null;
   const spring = { vx: 0, vy: 0, t: 0 };   // ความเร็วเป็น px/วินาที
   const SPRING = { k: 50, c: 3, m: 1 };    // stiffness, damping, mass ตามตัวอย่างของ Motion
-  addEventListener("pointermove", e => { mouse.x = e.clientX; mouse.y = e.clientY; mouse.on = true; }, { passive: true });
+  addEventListener("pointermove", e => {
+    mouse.x = e.clientX; mouse.y = e.clientY; mouse.on = true;
+    const dx = mouse.x - orb.x;
+    if (reduce && Math.abs(dx) > 8 && -Math.sign(dx) !== guideFacing) schedule();
+  }, { passive: true });
   document.addEventListener("pointerout", e => { if (!e.relatedTarget) mouse.on = false; });
   addEventListener("blur", () => { mouse.on = false; });
   // ไกด์มองตามสิ่งที่ผู้เล่นกำลังชี้ (ตัวเลือก ปุ่ม) ไปลอยข้างการ์ด ถ้าจอแคบไม่มีที่ข้างการ์ดก็ลอยตามปกติ
@@ -85,6 +91,15 @@ const City = (() => {
   document.body.append(bubble);
   let sayUntil = 0, sayTimer = 0, bubbleW = 0, bubbleH = 0;
   const guideW = () => Math.min(150, Math.max(92, W * 0.15)) * (1 + 0.28 * gloomAmt());
+  guide.className = "city-guide";
+  guide.alt = "";
+  guide.draggable = false;
+  document.body.append(guide);
+
+  function keepGuideVisible(radius, bob) {
+    orb.y = Math.max(radius, Math.min(H - radius, orb.y + bob)) - bob;
+    orb.x = Math.max(radius, Math.min(W - radius, orb.x));
+  }
   const clearR = () => guideW() * 1.9;
   const cam = { z: 1, x: 0.5, tz: 1, tx: 0.5, moving: false };
   let painted = [];   // { idx: ตึกในแถวหลัง, color, at }
@@ -991,16 +1006,32 @@ const City = (() => {
 
     const joy = 1 - gl;
     let hop = 0;
+    let guideAlpha = 1;
     if (!reduce) {
       const nowMs = performance.now();
       let tx, ty, ease = 0.03;
       const cb = cheer && nowMs < cheer.until && layers[0].blds[cheer.idx];
-      const slot = !cb && attendSlot();
-      if (slot) {
+      const slot = attendSlot();
+      if (cb) {
+        const ax = W * cam.x;
+        tx = ax + (cb.x + swayOf(0) + cb.w / 2 - ax) * cam.z;
+        ty = H + (H - cb.h - cb.tip - H) * cam.z - guideW() * 0.75;
+        ease = 0.085;
+        if (nowMs > cheer.start) hop = -Math.abs(Math.sin((nowMs - cheer.start) * 0.011)) * 16;
+      } else if (slot) {
         tx = slot.x; ty = slot.y; ease = 0.09;
-      } else if (following && mouse.on && !cb) {
+        if (blinkAt !== null) {
+          const elapsed = nowMs - blinkAt;
+          ease = elapsed < 110 ? 0 : 1;
+          guideAlpha = elapsed < 110 ? 1 - elapsed / 110 : Math.min(1, (elapsed - 110) / 150);
+          if (elapsed >= 110) trail.length = 0;
+          if (elapsed >= 260) blinkAt = null;
+        }
+      } else if (following && mouse.on) {
         // จุดกึ่งกลางของไกด์อยู่ตรงเคอร์เซอร์พอดี
-        const sx = mouse.x, sy = mouse.y;
+        const radius = guideReady() ? guideW() * Math.hypot(1, guide.naturalHeight / guide.naturalWidth) / 2 : 15;
+        const sx = Math.max(radius, Math.min(W - radius, mouse.x));
+        const sy = Math.max(radius, Math.min(H - radius, mouse.y));
         // สปริงฟิสิกส์แบบ Motion (motion.dev follow-pointer): m·a = -k·(x - เป้า) - c·v
         // ใช้เวลาจริง (วินาที) แบ่งเป็นสเต็ปย่อยให้เสถียรแม้เฟรมกระตุก
         let dt = Math.min(0.064, (nowMs - (spring.t || nowMs)) / 1000);
@@ -1014,12 +1045,6 @@ const City = (() => {
           dt -= h;
         }
         orb.vx += (spring.vx / 60 - orb.vx) * 0.1;
-      } else if (cb) {
-        const ax = W * cam.x;
-        tx = ax + (cb.x + swayOf(0) + cb.w / 2 - ax) * cam.z;
-        ty = H + (H - cb.h - cb.tip - H) * cam.z - guideW() * 0.75;
-        ease = 0.085;
-        if (nowMs > cheer.start) hop = -Math.abs(Math.sin((nowMs - cheer.start) * 0.011)) * 16;
       } else {
         cheer = null;
         const pace = 0.6 + 0.6 * joy;
@@ -1030,23 +1055,31 @@ const City = (() => {
         const nx = orb.x + (tx - orb.x) * ease;
         orb.vx += ((nx - orb.x) - orb.vx) * 0.1;
         const vy = (ty - orb.y) * ease;
-        spring.vx = (nx - orb.x) * 60; spring.vy = vy * 60;   // px/เฟรม → px/วินาที ส่งต่อแรงเฉื่อยให้สปริง
+        spring.vx = ease === 1 ? 0 : (nx - orb.x) * 60; spring.vy = ease === 1 ? 0 : vy * 60;   // px/เฟรม → px/วินาที ส่งต่อแรงเฉื่อยให้สปริง
         orb.x = nx;
         orb.y += vy;
       }
       spring.t = nowMs;
+
       const bk = (nowMs - bounceAt) / 700;
       if (bk >= 0 && bk < 1) hop += -Math.abs(Math.sin(bk * Math.PI * 2)) * 22 * (1 - bk);
     }
     const pulse = reduce ? 1 : 1 + 0.12 * Math.sin(t * 0.004);
+    guide.style.opacity = guideAlpha;
+    bubble.style.opacity = guideAlpha < 1 ? String(guideAlpha) : "";
+    if (!sayUntil) bubble.style.opacity = "";
+    f.save();
+    f.globalAlpha = guideAlpha;
 
     if (guideReady()) {
-      const gw = guideW();
+      const diagonal = Math.hypot(1, guide.naturalHeight / guide.naturalWidth);
+      const gw = following ? guideW() : Math.min(guideW(), W * 0.14);
       const gh = gw * guide.naturalHeight / guide.naturalWidth;
       const bob = reduce || (following && mouse.on) ? hop : Math.sin(t * (0.0016 + 0.0016 * joy)) * (3 + 4 * joy) + hop;
       const spinK = (performance.now() - spinAt) / SPIN_MS;
       const spin = !reduce && spinK >= 0 && spinK < 1 ? (1 - Math.pow(1 - spinK, 3)) * Math.PI * 2 : 0;
       const tilt = reduce ? 0 : Math.max(-0.22, Math.min(0.22, orb.vx * 0.08)) + Math.sin(t * 0.0017) * 0.04 + 0.1 * gl + spin;
+      keepGuideVisible(gw * diagonal / 2, bob);
       const gy = orb.gy = orb.y + bob;
       if (!reduce) {
         trail.push({ x: orb.x, y: gy });
@@ -1059,12 +1092,13 @@ const City = (() => {
       halo.addColorStop(1, "rgba(255,170,100,0)");
       f.fillStyle = halo;
       f.beginPath(); f.arc(orb.x, gy, gw * 0.75 * pulse, 0, 6.28); f.fill();
-      f.save();
-      f.translate(orb.x, gy); f.rotate(tilt);
-      f.drawImage(guide, -gw / 2, -gh / 2, gw, gh);
-      f.restore();
+      guide.style.width = gw + "px";
+      const pointerOffset = mouse.x - orb.x;
+      if (mouse.on && Math.abs(pointerOffset) > 8) guideFacing = -Math.sign(pointerOffset);
+      guide.style.transform = `translate3d(${orb.x - gw / 2}px, ${gy - gh / 2}px, 0) rotate(${tilt}rad) scaleX(${guideFacing})`;
       placeBubble(gh);
     } else {
+      keepGuideVisible(15, 0);
       orb.gy = orb.y;
       const g = f.createRadialGradient(orb.x, orb.y, 0, orb.x, orb.y, 44 * pulse);
       g.addColorStop(0, "rgba(255,255,255,1)");
@@ -1078,6 +1112,7 @@ const City = (() => {
       placeBubble(60);
     }
 
+    f.restore();
     // หยดสีของคำตอบ: บินโค้งจากแถวที่เลือกไปยอดตึก
     if (comets.length) {
       const now = performance.now();
@@ -1221,15 +1256,21 @@ const City = (() => {
     if (!attendEl) return null;
     if (!attendEl.isConnected) { attendEl = null; return null; }
     const r = attendEl.getBoundingClientRect();
-    const box = (attendEl.closest(".card, .reveal") || attendEl).getBoundingClientRect();
-    const gw = guideW(), need = gw * 1.15;
+    const box = r;
+    const gw = Math.min(guideW(), W * 0.14), need = gw * 1.15;
     const y = Math.min(H - gw * 0.6, Math.max(gw * 0.6, r.top + r.height / 2));
     if (W - box.right > need) return { x: box.right + gw * 0.62, y };
     if (box.left > need) return { x: box.left - gw * 0.62, y };
-    return null;
+    return { x: Math.max(gw / 2, r.left), y: r.top - gw * 0.65 };
   }
 
-  function attend(node) { attendEl = node || null; schedule(); }
+  function attend(node, selected = false) {
+    if (attendEl === node && !selected) return;
+    const glide = attendEl?.isConnected && !selected;
+    attendEl = node || null;
+    blinkAt = attendEl && !glide && !reduce ? performance.now() : null;
+    schedule();
+  }
 
   let lastGh = 60;
   function placeBubble(gh) {
